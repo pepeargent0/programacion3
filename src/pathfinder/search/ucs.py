@@ -8,6 +8,14 @@ from ..models.node import Node
 class UniformCostSearch:
     @staticmethod
     def search(grid: Grid) -> Solution:
+        """
+        Find path between two points in a grid using Depth First Search
+            Args:
+                grid (Grid): Grid of points
+
+            Returns:
+                Solution: Solution found
+        """
         # Initialize a node with the initial position
         start_node = Node("", grid.start, 0)
         explored: Dict[Tuple[int, int], bool] = {}
