@@ -42,8 +42,9 @@ if len(sys.argv) > 1:
             size = 90
 
         CELL_SIZE = size
-    except:
+    except Exception as error:
         print("\nInvalid command line arguments")
+        print(error)
         print("USAGE: python3 run.pyw [ --cell-size:<int> ]")
         exit(1)
 

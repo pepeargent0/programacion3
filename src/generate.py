@@ -5,7 +5,6 @@ import pygame
 from .animations import AnimatingNode, Animation, Animator
 from .constants import CELL_SIZE, DARK, GREEN_2, BLUE_2, MIN_SIZE, WHITE
 
-
 GenerationCallback = Callable[[], None]
 
 
@@ -26,16 +25,16 @@ class MazeGenerator:
         Returns:
             bool: Whether the cell exists
         """
-        rowIdx, colIdx = pos
+        row_idx, col_idx = pos
 
-        return 0 <= rowIdx < self.maze.height \
-            and 0 <= colIdx < self.maze.width
+        return 0 <= row_idx < self.maze.height \
+            and 0 <= col_idx < self.maze.width
 
     def _get_two_step_neighbors(
-        self,
-        maze: list[list[Any]],
-        cell: tuple[int, int],
-        value: str = ""
+            self,
+            maze: list[list[Any]],
+            cell: tuple[int, int],
+            value: str = ""
     ) -> list[tuple[int, int]]:
         """Get neighbors of a cell which are two steps away
 
@@ -62,6 +61,17 @@ class MazeGenerator:
 
         return [neighbor for neighbor in neighbors
                 if self._is_valid_cell(neighbor)]
+
+    def add_wall_animation(self, x, y, color=BLUE_2, value="1", animation=None):
+        x, y = self.maze.coords[x][y]
+        return AnimatingNode(
+            rect=pygame.Rect(0, 0, MIN_SIZE, MIN_SIZE),
+            center=(x + CELL_SIZE // 2, y + CELL_SIZE // 2),
+            value=value,
+            ticks=pygame.time.get_ticks(),
+            color=color,
+            animation=animation
+        )
 
     def randomised_prims_algorithm(self) -> None:
         """Generate maze by Randomised Prim's algorithm
@@ -111,28 +121,8 @@ class MazeGenerator:
                 maze[cell[0]][cell[1]] = "1"
 
                 # For animations
-                x, y = self.maze.coords[wall[0]][wall[1]]
-                nodes_to_animate.append(
-                    AnimatingNode(
-                        rect=pygame.Rect(0, 0, MIN_SIZE, MIN_SIZE),
-                        center=(x + CELL_SIZE // 2, y + CELL_SIZE // 2),
-                        value="1",
-                        ticks=pygame.time.get_ticks(),
-                        color=BLUE_2
-                    )
-                )
-
-                x, y = self.maze.coords[cell[0]][cell[1]]
-                nodes_to_animate.append(
-                    AnimatingNode(
-                        rect=pygame.Rect(0, 0, MIN_SIZE, MIN_SIZE),
-                        center=(x + CELL_SIZE // 2, y + CELL_SIZE // 2),
-                        value="1",
-                        ticks=pygame.time.get_ticks(),
-                        color=GREEN_2
-                    )
-                )
-
+                nodes_to_animate.append(self.add_wall_animation(wall[0], wall[1], color=BLUE_2))
+                nodes_to_animate.append(self.add_wall_animation(cell[0], cell[1], color=GREEN_2))
                 frontier.extend(self._get_two_step_neighbors(maze, cell, "#"))
 
             # Add current frontier cell to the visited cell
@@ -151,9 +141,9 @@ class MazeGenerator:
         nodes_to_animate = []
 
         # Draw Walls everywhere except the start and goal pos
-        for rowIdx in range(self.maze.height):
-            for colIdx in range(self.maze.width):
-                self.maze.set_cell((rowIdx, colIdx), "#")
+        for row_idx in range(self.maze.height):
+            for col_idx in range(self.maze.width):
+                self.maze.set_cell((row_idx, col_idx), "#")
 
         stack = [self.maze.start]
 
@@ -173,38 +163,16 @@ class MazeGenerator:
             # Choose one neighbor and break wall between the neighbor
             # and the current cell. Also set the neighbor to type "1"
             if unvisited_neighbors:
-                next = random.choice(unvisited_neighbors)
+                next_neighbor = random.choice(unvisited_neighbors)
                 stack.append(curr)
-
-                x, y = self.maze.coords[next[0]][next[1]]
-                nodes_to_animate.append(
-                    AnimatingNode(
-                        rect=pygame.Rect(0, 0, MIN_SIZE, MIN_SIZE),
-                        center=(x + CELL_SIZE // 2, y + CELL_SIZE // 2),
-                        value="1",
-                        ticks=pygame.time.get_ticks(),
-                        color=BLUE_2
-                    )
-                )
-
-                rowIdx = (curr[0] + next[0]) // 2
-                colIdx = (curr[1] + next[1]) // 2
-                x, y = self.maze.coords[rowIdx][colIdx]
-
-                nodes_to_animate.append(
-                    AnimatingNode(
-                        rect=pygame.Rect(0, 0, MIN_SIZE, MIN_SIZE),
-                        center=(x + CELL_SIZE // 2, y + CELL_SIZE // 2),
-                        value="1",
-                        ticks=pygame.time.get_ticks(),
-                        color=GREEN_2,
-                    )
-                )
-
+                nodes_to_animate.append(self.add_wall_animation(next_neighbor[0], next_neighbor[1], color=BLUE_2))
+                row_idx = (curr[0] + next_neighbor[0]) // 2
+                col_idx = (curr[1] + next_neighbor[1]) // 2
+                nodes_to_animate.append(self.add_wall_animation(row_idx, col_idx, color=GREEN_2))
                 # Add the neighbor to the visited set and push it
                 # to the stack
-                visited.add(next)
-                stack.append(next)
+                visited.add(next_neighbor)
+                stack.append(next_neighbor)
 
         # Add animating nodes for animation
         self.maze.animator.add_nodes_to_animate(nodes_to_animate)
@@ -218,19 +186,8 @@ class MazeGenerator:
             for colIdx in range(self.maze.height):
                 if random.randint(1, 10) < 8:
                     continue
-
-                x, y = self.maze.coords[colIdx][rowIdx]
-                nodes.append(
-                    AnimatingNode(
-                        rect=pygame.Rect(0, 0, MIN_SIZE, MIN_SIZE),
-                        center=(x + CELL_SIZE // 2, y + CELL_SIZE // 2),
-                        ticks=pygame.time.get_ticks(),
-                        value="9",
-                        color=WHITE,
-                        animation=Animation.WEIGHT_ANIMATION
-                    )
-                )
-
+                nodes.append(self.add_wall_animation(colIdx, rowIdx, color=WHITE, value="9",
+                                                     animation=Animation.WEIGHT_ANIMATION))
         self.maze.animator.add_nodes_to_animate(nodes, gap=2)
 
     def basic_random_maze(self) -> None:
@@ -241,26 +198,15 @@ class MazeGenerator:
             for colIdx in range(self.maze.height):
                 if random.randint(1, 10) < 8:
                     continue
-
-                x, y = self.maze.coords[colIdx][rowIdx]
-                nodes.append(
-                    AnimatingNode(
-                        rect=pygame.Rect(0, 0, MIN_SIZE, MIN_SIZE),
-                        center=(x + CELL_SIZE // 2, y + CELL_SIZE // 2),
-                        ticks=pygame.time.get_ticks(),
-                        value="#",
-                        color=DARK
-                    )
-                )
-
+                nodes.append(self.add_wall_animation(colIdx, rowIdx, color=DARK, value="#"))
         self.maze.animator.add_nodes_to_animate(nodes, gap=2)
 
     def recursive_division(
-        self,
-        x1: int,
-        x2: int,
-        y1: int,
-        y2: int
+            self,
+            x1: int,
+            x2: int,
+            y1: int,
+            y2: int
     ) -> None:
         """Generate maze by recursive division algorithm
 
@@ -297,12 +243,12 @@ class MazeGenerator:
             self.recursive_division(*args)
 
     def _draw_line(
-        self,
-        x1: int,
-        x2: int,
-        y1: int,
-        y2: int,
-        horizontal: bool = False
+            self,
+            x1: int,
+            x2: int,
+            y1: int,
+            y2: int,
+            horizontal: bool = False
     ) -> int:
         """Draw walls horizontally or vertically
 
@@ -345,19 +291,8 @@ class MazeGenerator:
 
             # Create a rectangle
             rect = pygame.Rect(0, 0, MIN_SIZE, MIN_SIZE)
-
+            rect.center = (wall_coords[0] + CELL_SIZE // 2, wall_coords[1] + CELL_SIZE // 2)
             # Set the starting position of the rectangle
-            x, y = self.maze.coords[wall_coords[0]][wall_coords[1]]
-            rect.center = (x + CELL_SIZE // 2, y + CELL_SIZE // 2)
-            nodes_to_animate.append(
-                AnimatingNode(
-                    center=(x + CELL_SIZE // 2, y + CELL_SIZE // 2),
-                    rect=rect,
-                    ticks=pygame.time.get_ticks(),
-                    value="#",
-                    color=DARK
-                )
-            )
+            nodes_to_animate.append(self.add_wall_animation(wall_coords[0], wall_coords[1], color=DARK, value="#"))
         self.maze.animator.add_nodes_to_animate(nodes_to_animate)
-
         return wall

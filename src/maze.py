@@ -1,7 +1,6 @@
 from typing import Optional
 import pygame
 
-
 from .generate import GenerationCallback, MazeGenerator
 from .animations import AnimatingNode, Animation, AnimationCallback, Animator
 from .pathfinder.models.node import Node
@@ -38,20 +37,22 @@ from .constants import (
 
 class MazeNode(Node):
     def __init__(
-        self,
-        value: str,
-        state: tuple[int, int],
-        cost: int,
-        parent: Node | None = None,
-        action: str | None = None,
-        color: tuple[int, int, int] = WHITE
+            self,
+            value: str,
+            state: tuple[int, int],
+            cost: int,
+            parent: Node | None = None,
+            action: str | None = None,
+            color: tuple[int, int, int] = WHITE
     ) -> None:
         super().__init__(value, state, cost, parent, action)
         self.color = color
-
+        
 
 class Maze:
     def __init__(self, surface: pygame.surface.Surface) -> None:
+        self.generator = None
+        self.animator = None
         self.surface = surface
         self.animator: Animator
         self.generator: MazeGenerator
@@ -95,7 +96,6 @@ class Maze:
             row = []
 
             for j in range(self.width):
-
                 # Calculate coordinates for the cell
                 x = j * CELL_SIZE + (REMAINDER_W // 2)
                 y = i * CELL_SIZE + HEADER_HEIGHT
@@ -179,7 +179,7 @@ class Maze:
         Args:
             speed_str (str): Speed string
         """
-        if not speed_str in ("Fast", "Medium", "Slow"):
+        if speed_str not in ("Fast", "Medium", "Slow"):
             return
 
         self.speed = speed_str
@@ -212,7 +212,8 @@ class Maze:
         self.set_cell(self.start, "A", forced=True)
         self.set_cell(self.goal, "B", forced=True)
 
-    def mouse_within_bounds(self, pos: tuple[int, int]) -> bool:
+    @staticmethod
+    def mouse_within_bounds(pos: tuple[int, int]) -> bool:
         """Check if mouse cursor is inside the maze
 
         Args:
@@ -229,7 +230,8 @@ class Maze:
             pos[1] < HEIGHT - REMAINDER_H
         ))
 
-    def get_cell_pos(self, pos: tuple[int, int]) -> tuple[int, int]:
+    @staticmethod
+    def get_cell_pos(pos: tuple[int, int]) -> tuple[int, int]:
         """Get cell position from mouse
 
         Args:
@@ -253,7 +255,7 @@ class Maze:
                 x, y = self.coords[i][j]
                 center = (x + CELL_SIZE // 2, y + CELL_SIZE // 2)
 
-                if not center in nodes_to_animate:
+                if center not in nodes_to_animate:
                     self._draw_rect((i, j), node.color)
                     continue
 
@@ -270,14 +272,15 @@ class Maze:
                     self._draw_rect((i, j), node.color)
 
     def generate_maze(
-        self,
-        algorithm: str,
-        after_generation: Optional[GenerationCallback] = None
+            self,
+            algorithm: str,
+            after_generation: Optional[GenerationCallback] = None
     ) -> None:
         """Generate maze using an algorithm
 
         Args:
             algorithm (str): Algorithm name
+            after_generation
         """
 
         match algorithm:
@@ -360,7 +363,7 @@ class Maze:
 
         self.animator.add_nodes_to_animate(nodes_to_animate)
 
-    def solve(self, algo_name: str,) -> Solution:
+    def solve(self, algo_name: str, ) -> Solution:
         """Solve the maze with an algorithm
 
         Args:
@@ -388,9 +391,9 @@ class Maze:
         return solution
 
     def visualize(
-        self,
-        solution: Solution,
-        after_animation: Optional[AnimationCallback] = None,
+            self,
+            solution: Solution,
+            after_animation: Optional[AnimationCallback] = None,
     ) -> None:
         """Visualize solution
 
@@ -469,7 +472,6 @@ class Maze:
         Args:
             coords (tuple[int, int]): Cell coordinates
             color (tuple[int, int, int], optional): Color. Defaults to YELLOW.
-            delay (bool, optional): Whether to delay after execution. Defaults to False.
         """
 
         # Determine maze coordinates

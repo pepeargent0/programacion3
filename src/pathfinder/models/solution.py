@@ -1,19 +1,19 @@
 from .node import Node
 
+
 class Solution:
     """Model a solution to a pathfinding problem"""
 
     def __init__(
-        self,
-        node: Node,
-        explored: dict[tuple[int, int]],
-        time: float = 0
+            self,
+            node: Node,
+            explored: dict[tuple[int, int]],
+            time: float = 0
     ) -> None:
-
         #  Generate path and return a Solution object
         path = []
         temp = node
-        while temp.parent != None:
+        while temp.parent is not None:
             path.append(temp.state)
             temp = temp.parent
         path.append(temp.state)
@@ -35,9 +35,9 @@ class NoSolution(Solution):
     """Model an empty pathfinding solution"""
 
     def __init__(
-        self,
-        explored: dict[tuple[int, int]],
-        time: float = 0
+            self,
+            explored: dict[tuple[int, int]],
+            time: float = 0
     ) -> None:
         self.path = []
         self.path_cost = 0

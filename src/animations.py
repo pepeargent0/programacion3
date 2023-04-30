@@ -84,6 +84,7 @@ class Animator:
         Args:
             nodes (list[AnimatingNode]): List of nodes
             delay (bool, optional): Whether to wait for previous nodes to animate. Defaults to False.
+            gap
         """
 
         # Update first node's ticks and add it to the list
@@ -335,7 +336,7 @@ class Animator:
         Args:
             time (float): The current time of the animation.
             starting_value (float): The starting value of the animation.
-            change (float): The change in value of the animation.
+            change_in_value (float): The change in value of the animation.
             duration (float): The total duration of the animation in milliseconds.
 
         Returns:

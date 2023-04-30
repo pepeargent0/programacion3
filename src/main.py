@@ -337,7 +337,7 @@ def main() -> None:
     state.done_visualising = False
     state.need_update = True
 
-    draw_weighted_nodes = False
+    # draw_weighted_nodes = False
 
     dragging = False
     cell_under_mouse = (-1, -1)
@@ -371,7 +371,7 @@ def main() -> None:
             if event.type == pygame.MOUSEBUTTONUP:
                 mouse_is_down = False
                 animator.animating = False
-                draw_weighted_nodes = False
+                # draw_weighted_nodes = False
 
                 if dragging:
                     dragging = False
@@ -461,7 +461,7 @@ def main() -> None:
 
             if maze.mouse_within_bounds((x, y)):
                 row, col = maze.get_cell_pos((x, y))
-                x, y = maze.coords[row][col]
+                # x, y = maze.coords[row][col]
 
                 if cell_under_mouse != (row, col):
                     maze.set_cell((row, col), cell_value)
@@ -476,33 +476,32 @@ def main() -> None:
         CLOCK.tick(FPS)
 
 
-def instant_algorithm(maze: Maze, algo_name: str):
+def instant_algorithm(maze_tmp: Maze, algo_name: str):
     """Find path without animation
 
     Args:
-        maze (Maze): Maze
+        maze_tmp (Maze): Maze
         algo_name (str): Algorithm name
     """
-    maze.clear_visited()
-
-    solution = maze.solve(algo_name=algo_name)
+    maze_tmp.clear_visited()
+    solution = maze_tmp.solve(algo_name=algo_name)
 
     path = solution.path
     explored = solution.explored
 
     # Mark explored nodes as blue
     for i, j in explored:
-        if (i, j) in (maze.start, maze.goal):
+        if (i, j) in (maze_tmp.start, maze_tmp.goal):
             continue
 
-        maze.set_cell((i, j), "V")
+        maze_tmp.set_cell((i, j), "V")
 
     # Mark optimal path nodes as yellow
     for i, j in path:
-        if (i, j) in (maze.start, maze.goal):
+        if (i, j) in (maze_tmp.start, maze_tmp.goal):
             continue
 
-        maze.set_cell((i, j), "*")
+        maze_tmp.set_cell((i, j), "*")
 
 
 def get_pressed() -> tuple[bool, int | None]:
@@ -826,16 +825,15 @@ def show_results(results: list[tuple[str, dict[str, float]]]) -> None:
     Args:
         results (list[tuple[str, dict[str, float]]]): Result data
     """
-    children: list[list[TableCell]] = []
-    children.append([
+    children: list[list[TableCell]] = [[
         TableCell(
             child=Label(
-                    "Algorithm", 0, 0,
-                    background_color=pygame.Color(*DARK_BLUE),
-                    foreground_color=pygame.Color(*WHITE),
-                    padding=6, font_size=20, outline=False,
-                    surface=WINDOW,
-                    ),
+                "Algorithm", 0, 0,
+                background_color=pygame.Color(*DARK_BLUE),
+                foreground_color=pygame.Color(*WHITE),
+                padding=6, font_size=20, outline=False,
+                surface=WINDOW,
+            ),
             color=DARK_BLUE,
         ),
         TableCell(
@@ -878,7 +876,7 @@ def show_results(results: list[tuple[str, dict[str, float]]]) -> None:
             ),
             color=DARK_BLUE,
         ),
-    ])
+    ]]
 
     colors = [GREEN_2, GREEN_2, YELLOW, YELLOW]
     colors.extend([GRAY] * (len(results) - 4))

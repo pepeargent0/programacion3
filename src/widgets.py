@@ -95,7 +95,7 @@ class Button(Widget):
         """Draw the button (or label)
 
         Args:
-            surf (pygame.surface.Surface): Window surface
+            self (pygame.surface.Surface): Window surface
 
         Returns:
             bool: Whether this button was clicked
@@ -108,8 +108,7 @@ class Button(Widget):
         pos = pygame.mouse.get_pos()
 
         # Check mouseover and clicked conditions
-        action = self.rect.collidepoint(pos) \
-            and pygame.mouse.get_pressed()[0]
+        action = self.rect.collidepoint(pos) and pygame.mouse.get_pressed()[0]
 
         # Draw button
         pygame.draw.rect(self.screen, self.background_color, self.rect)
@@ -132,7 +131,7 @@ class Label(Button):
         """Draw label
 
         Args:
-            surf (pygame.surface.Surface): Destination surface
+            self (pygame.surface.Surface): Destination surface
         """
         # Draw label rectangle
         pygame.draw.rect(self.screen, self.background_color, self.rect)
@@ -149,10 +148,10 @@ class Label(Button):
 
 class Menu(Widget):
     def __init__(
-        self,
-        surface: pygame.surface.Surface,
-        button: Button,
-        children: list[Widget]
+            self,
+            surface: pygame.surface.Surface,
+            button: Button,
+            children: list[Widget]
     ) -> None:
         self.screen = surface
         self.button = button
@@ -181,10 +180,9 @@ class Menu(Widget):
 
         self.rect = self.button.rect
         self.popup_rect = pygame.Rect(self.x - 20,
-                                self.button.rect.bottom,
-                                self.width + 40,
-                                self.height + 20)
-        
+                                      self.button.rect.bottom,
+                                      self.width + 40,
+                                      self.height + 20)
 
     def set_surface(self, surf: pygame.surface.Surface) -> None:
         self.screen = surf
@@ -194,7 +192,7 @@ class Menu(Widget):
         """Draw the menu
 
         Args:
-            surf (pygame.surface.Surface): Window surface
+            self (pygame.surface.Surface): Window surface
 
         Returns:
             bool: Whether any button in this menu is clicked
@@ -245,10 +243,10 @@ class Alignment(Enum):
 
 class TableCell:
     def __init__(
-        self,
-        child: Widget,
-        color: tuple[int, int, int] = WHITE,
-        align: Alignment = Alignment.NONE
+            self,
+            child: Widget,
+            color: tuple[int, int, int] = WHITE,
+            align: Alignment = Alignment.NONE
     ) -> None:
         self.child = child
         self.color = color
@@ -262,15 +260,15 @@ class TableCell:
 
 class Table(Widget):
     def __init__(
-        self,
-        x: int,
-        y: int,
-        rows: int,
-        columns: int,
-        children: list[list[TableCell]],
-        color: tuple[int, int, int] = WHITE,
-        padding: int = 0,
-        surface: pygame.surface.Surface | None = None,
+            self,
+            x: int,
+            y: int,
+            rows: int,
+            columns: int,
+            children: list[list[TableCell]],
+            color: tuple[int, int, int] = WHITE,
+            padding: int = 0,
+            surface: pygame.surface.Surface | None = None,
     ) -> None:
         self.x, self.y = 0, 0
         self.padding = padding
@@ -343,18 +341,18 @@ class Table(Widget):
 
 class Popup(Widget):
     def __init__(
-        self,
-        surface: pygame.surface.Surface,
-        x: int,
-        y: int,
-        children: list[Widget],
-        padding: int,
-        color: tuple[int, int, int] = WHITE,
-        width: int | None = None,
-        height: int | None = None,
-        orientation: Orientation = Orientation.HORIZONTAL,
-        x_align: Alignment = Alignment.NONE,
-        y_align: Alignment = Alignment.NONE,
+            self,
+            surface: pygame.surface.Surface,
+            x: int,
+            y: int,
+            children: list[Widget],
+            padding: int,
+            color: tuple[int, int, int] = WHITE,
+            width: int | None = None,
+            height: int | None = None,
+            orientation: Orientation = Orientation.HORIZONTAL,
+            x_align: Alignment = Alignment.NONE,
+            y_align: Alignment = Alignment.NONE,
     ) -> None:
         self.screen = surface
         self.children = children
@@ -393,19 +391,19 @@ class Popup(Widget):
             match x_align:
                 case Alignment.CENTER:
                     children[0].rect.left = (
-                        self.width - content_width) // 2
+                                                    self.width - content_width) // 2
                 case Alignment.RIGHT:
                     children[0].rect.left = (
-                        self.width - self.padding - content_width)
+                            self.width - self.padding - content_width)
                 case _:
                     children[0].rect.left = self.padding
 
             match y_align:
                 case Alignment.CENTER:
-                    children[0].rect.centery = (self.height) // 2
+                    children[0].rect.centery = self.height // 2
                 case Alignment.BOTTOM:
                     children[0].rect.top = (
-                        self.height - self.padding - content_height
+                            self.height - self.padding - content_height
                     )
                 case _:
                     children[0].rect.top = self.padding
@@ -426,17 +424,17 @@ class Popup(Widget):
                     children[0].rect.centerx = self.width // 2
                 case Alignment.RIGHT:
                     children[0].rect.left = (
-                        self.width - self.padding - content_width)
+                            self.width - self.padding - content_width)
                 case _:
                     children[0].rect.left = self.padding
 
             match y_align:
                 case Alignment.CENTER:
                     children[0].rect.top = (
-                        self.height - content_height) // 2
+                                                   self.height - content_height) // 2
                 case Alignment.BOTTOM:
                     children[0].rect.top = (
-                        self.height - self.padding - content_height
+                            self.height - self.padding - content_height
                     )
                 case _:
                     children[0].rect.top = self.padding

@@ -10,7 +10,6 @@ from .search.goright import GoRight
 from .models.grid import Grid
 from .models.solution import Solution
 from .models.search_types import Search
-from .models.search_types import Search
 
 SearchFunction = Callable[[Grid], Solution]
 

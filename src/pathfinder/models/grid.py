@@ -27,7 +27,8 @@ class Grid:
         """
         return self.grid[pos[0]][pos[1]]
 
-    def heuristic(self, state, goal):
+    @staticmethod
+    def heuristic(state, goal):
         """Calculate the Euclidean distance heuristic between two points"""
         x1, y1 = state
         x2, y2 = goal

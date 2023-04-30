@@ -1,5 +1,5 @@
+from .heuristic import init_heuristic
 from ..models.grid import Grid
-from ..models.frontier import PriorityQueueFrontier
 from ..models.solution import NoSolution, Solution
 from ..models.node import Node
 from typing import Dict, Tuple
@@ -18,14 +18,8 @@ class GreedyBestFirstSearch:
             Solution: The solution containing the path and the explored nodes.
         """
         # Initialize a node with the initial position
-        node = Node("", grid.start, 0)
-        node.f_cost = node.cost + int(grid.heuristic(node.state, grid.end))
-        # Initialize the explored set to be empty
+        frontier = init_heuristic(grid)
         explored: Dict[Tuple[int, int], bool] = {}
-        # Initialize the frontier with the starting node
-        frontier = PriorityQueueFrontier()
-        frontier.add(node)
-
         while not frontier.is_empty():
             node = frontier.pop()
             if node.state == grid.end:

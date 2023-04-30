@@ -1,4 +1,3 @@
-from src.pathfinder.models.solution import Solution
 from src.widgets import Label, Popup
 
 

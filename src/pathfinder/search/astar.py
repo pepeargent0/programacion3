@@ -1,5 +1,6 @@
 from typing import Dict, Tuple
-from ..models.frontier import PriorityQueueFrontier
+
+from .heuristic import init_heuristic
 from ..models.grid import Grid
 from ..models.node import Node
 from ..models.solution import Solution, NoSolution
@@ -17,12 +18,8 @@ class AStarSearch:
                 Solution: Solution found
         """
         # Initialize start node with heuristic cost 0
-        start_node = Node("", grid.start, 0)
-        start_node.f_cost = start_node.cost + int(grid.heuristic(start_node.state, grid.end))
-        # Initialize the explored dictionary to be empty
+        frontier = init_heuristic(grid)
         explored: Dict[Tuple[int, int], bool] = {}
-        frontier = PriorityQueueFrontier()
-        frontier.add(start_node)
         while not frontier.is_empty():
             node = frontier.pop()
             if node.state == grid.end:

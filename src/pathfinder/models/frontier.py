@@ -77,6 +77,7 @@ class QueueFrontier(Frontier):
 
 class PriorityQueueFrontier(Frontier):
     def __init__(self):
+        super().__init__()
         self.frontier: list[tuple[int, Node]] = []
 
     def add(self, node: Node, priority: int = 0) -> None:
@@ -88,7 +89,7 @@ class PriorityQueueFrontier(Frontier):
         """
         heappush(self.frontier, (priority, node))
 
-    def get(self, state: tuple[int, int]) -> Node | None:
+    def get(self, state: tuple[int, int]) -> tuple[int, Node] | None:
         """Get node by state. Create new if not found
 
         Args:
@@ -100,7 +101,7 @@ class PriorityQueueFrontier(Frontier):
         """
         for priority, node in self.frontier:
             if node.state == state:
-                return (priority, node)
+                return priority, node
 
         return None
 
