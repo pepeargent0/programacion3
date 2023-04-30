@@ -3,7 +3,6 @@ from enum import Enum
 import math
 import pygame
 
-
 from .constants import (
     DARK,
     FONT_14,
@@ -29,17 +28,19 @@ AnimationCallback = Callable[[], None]
 
 class AnimatingNode:
     def __init__(
-        self,
-        rect: pygame.Rect,
-        value: str,
-        ticks: int,
-        center: tuple[int, int],
-        color: tuple[int, int, int],
-        after_animation: Optional[AnimationCallback] = None,
-        colors: list[tuple[int, int, int]] = [],
-        animation: Animation = Animation.WALL_ANIMATION,
-        duration: int = 300,
+            self,
+            rect: pygame.Rect,
+            value: str,
+            ticks: int,
+            center: tuple[int, int],
+            color: tuple[int, int, int],
+            after_animation: Optional[AnimationCallback] = None,
+            colors=None,
+            animation: Animation = Animation.WALL_ANIMATION,
+            duration: int = 300,
     ) -> None:
+        if colors is None:
+            colors = []
         self.rect = rect
         self.value = value
         self.ticks = ticks
@@ -74,10 +75,10 @@ class Animator:
         self.need_update = False
 
     def add_nodes_to_animate(
-        self,
-        nodes: list[AnimatingNode],
-        delay: int = 0,
-        gap: int = 10
+            self,
+            nodes: list[AnimatingNode],
+            delay: int = 0,
+            gap: int = 10
     ) -> None:
         """Add nodes for animation
 
@@ -324,12 +325,12 @@ class Animator:
                 width=1
             )
 
+    @staticmethod
     def _ease_out_sine(
-        self,
-        time: float,
-        starting_value: float,
-        change_in_value: float,
-        duration: float
+            time: float,
+            starting_value: float,
+            change_in_value: float,
+            duration: float
     ) -> float:
         """Calculate current size
 

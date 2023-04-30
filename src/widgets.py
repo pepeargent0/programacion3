@@ -102,7 +102,6 @@ class Button(Widget):
         """
 
         # Whether button is clicked or not
-        action = False
 
         # Get mouse position
         pos = pygame.mouse.get_pos()
