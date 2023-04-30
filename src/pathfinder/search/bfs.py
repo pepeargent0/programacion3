@@ -22,6 +22,8 @@ class BreadthFirstSearch:
         frontier = QueueFrontier()
         frontier.add(node)
         while not frontier.is_empty():
+            if frontier.is_empty():
+                return NoSolution(explored)
             node = frontier.remove()
             explored[node.state] = True
             if node.state == grid.end:
