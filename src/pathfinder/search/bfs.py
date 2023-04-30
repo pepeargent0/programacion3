@@ -21,9 +21,7 @@ class BreadthFirstSearch:
         explored = {}
         frontier = QueueFrontier()
         frontier.add(node)
-        while True:
-            if frontier.is_empty():
-                return NoSolution(explored)
+        while not frontier.is_empty():
             node = frontier.remove()
             explored[node.state] = True
             if node.state == grid.end:
@@ -37,6 +35,3 @@ class BreadthFirstSearch:
                     new_node.action = neighbor_state
                     frontier.add(new_node)
         return NoSolution(explored)
-
-
-
