@@ -21,22 +21,17 @@ class DepthFirstSearch:
         explored = {}
         frontier = StackFrontier()
         frontier.add(node)
-        print(frontier)
         while not frontier.is_empty():
             node = frontier.remove()
             explored[node.state] = True
-            print(explored)
             if node.state == grid.end:
                 return Solution(node, explored)
             neighbours = grid.get_neighbours(node.state)
             for neighbor_state in neighbours:
                 new_state = neighbours[neighbor_state]
-                print(neighbor_state not in explored, frontier.contains_state(new_state))
-                if neighbor_state not in explored:
+                if new_state not in explored:
                     new_node = Node("", new_state, node.cost + grid.get_cost(new_state))
                     new_node.parent = node
                     new_node.action = neighbor_state
                     frontier.add(new_node)
-                else:
-                    print('aca')
         return NoSolution(explored)
