@@ -2,6 +2,7 @@ from ..models.grid import Grid
 from ..models.frontier import QueueFrontier
 from ..models.solution import NoSolution, Solution
 from ..models.node import Node
+import time
 
 
 class BreadthFirstSearch:
@@ -21,16 +22,19 @@ class BreadthFirstSearch:
         explored = {}
         frontier = QueueFrontier()
         frontier.add(node)
+        start_time = time.time()
+        timeout = 5  # Timeout in seconds
         while not frontier.is_empty():
-            if frontier.is_empty():
+            # Check if the elapsed time exceeds the timeout
+            if time.time() - start_time > timeout:
                 return NoSolution(explored)
             node = frontier.remove()
             explored[node.state] = True
             if node.state == grid.end:
                 return Solution(node, explored)
-            neighbours = grid.get_neighbours(node.state)
-            for neighbor_state in neighbours:
-                new_state = neighbours[neighbor_state]
+            neighbors = grid.get_neighbours(node.state)
+            for neighbor_state in neighbors:
+                new_state = neighbors[neighbor_state]
                 if neighbor_state not in explored and not frontier.contains_state(new_state):
                     new_node = Node("", new_state, node.cost + grid.get_cost(new_state))
                     new_node.parent = node
