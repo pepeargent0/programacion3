@@ -2,14 +2,11 @@ from ..models.grid import Grid
 from ..models.frontier import QueueFrontier
 from ..models.solution import NoSolution, Solution
 from ..models.node import Node
-import time
-
 
 class BreadthFirstSearch:
     @staticmethod
     def search(grid: Grid) -> Solution:
         """Find path between two points in a grid using Breadth First Search
-
         Args:
             grid (Grid): Grid of points
 
@@ -23,14 +20,8 @@ class BreadthFirstSearch:
         explored[node.state] = True
         frontier = QueueFrontier()
         frontier.add(node)
-        start_time = time.time()
-        #timeout = 5  # Timeout in seconds
         while not frontier.is_empty():
-            # Check if the elapsed time exceeds the timeout
-     
             node = frontier.remove()
-            
-            
             neighbors = grid.get_neighbours(node.state)
             for action in neighbors:
                 new_state = neighbors[action]
@@ -40,7 +31,6 @@ class BreadthFirstSearch:
                     new_node.action = action
                     if new_state == grid.end:
                         return Solution(node, explored)
-                
                     explored[new_state] = True
                     frontier.add(new_node)
         return NoSolution(explored)
