@@ -1,6 +1,6 @@
 from typing import Dict, Tuple
 
-from .heuristic import init_heuristic
+from .heuristic import init_heuristic, common_heuristic
 from ..models.grid import Grid
 from ..models.node import Node
 from ..models.solution import Solution, NoSolution
@@ -18,7 +18,8 @@ class AStarSearch:
                 Solution: Solution found
         """
         # Initialize start node with heuristic cost 0
-        frontier = init_heuristic(grid)
+        return common_heuristic(grid, "A*")
+        """
         explored: Dict[Tuple[int, int], bool] = {}
         while not frontier.is_empty():
             node = frontier.pop()
@@ -34,7 +35,7 @@ class AStarSearch:
                     new_node = Node("", new_state, node.cost + grid.get_cost(new_state))
                     new_node.parent = node
                     new_node.action = neighbor_state
-                    priority =new_node.cost + int(grid.heuristic(new_state, grid.end))
-                    #new_node.cost = costo
+                    priority = new_node.cost + int(grid.heuristic(new_state, grid.end))
                     frontier.add(new_node, priority)
         return NoSolution(explored)
+        """

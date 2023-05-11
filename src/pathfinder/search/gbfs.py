@@ -1,4 +1,4 @@
-from .heuristic import init_heuristic
+from .heuristic import init_heuristic, common_heuristic
 from ..models.grid import Grid
 from ..models.solution import NoSolution, Solution
 from ..models.node import Node
@@ -18,7 +18,8 @@ class GreedyBestFirstSearch:
             Solution: The solution containing the path and the explored nodes.
         """
         # Initialize a node with the initial position
-        frontier = init_heuristic(grid)
+        return common_heuristic(grid, "greedy")
+        """
         explored: Dict[Tuple[int, int], bool] = {}
         while not frontier.is_empty():
             node = frontier.pop()
@@ -34,6 +35,7 @@ class GreedyBestFirstSearch:
                     new_node = Node("", new_state, node.cost + grid.get_cost(new_state))
                     new_node.parent = node
                     new_node.action = neighbour_state
-                    new_node.f_cost = new_node.cost + grid.heuristic(new_state, grid.end)
-                    frontier.add(new_node)
+                    priority = new_node.cost + int(grid.heuristic(new_state, grid.end))
+                    frontier.add(new_node, priority)
         return NoSolution(explored)
+        """
