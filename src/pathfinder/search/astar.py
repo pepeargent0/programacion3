@@ -34,6 +34,7 @@ class AStarSearch:
                     new_node = Node("", new_state, node.cost + grid.get_cost(new_state))
                     new_node.parent = node
                     new_node.action = neighbor_state
-                    new_node.f_cost = node.cost + grid.get_cost(new_state) + grid.heuristic(new_state, grid.end)
-                    frontier.add(new_node)
+                    priority =new_node.cost + int(grid.heuristic(new_state, grid.end))
+                    #new_node.cost = costo
+                    frontier.add(new_node, priority)
         return NoSolution(explored)
