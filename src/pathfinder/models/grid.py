@@ -27,12 +27,7 @@ class Grid:
         """
         return self.grid[pos[0]][pos[1]]
 
-    @staticmethod
-    def heuristic(state, goal):
-        """Calculate the Euclidean distance heuristic between two points"""
-        x1, y1 = state
-        x2, y2 = goal
-        return ((x1 - x2) ** 2 + (y1 - y2) ** 2) ** 0.5
+
 
     def get_cost(self, pos: tuple[int, int]) -> int:
         """Get weight of a node
