@@ -15,12 +15,26 @@ No viene implementado, se debe completar.
 No viene implementado, se debe completar.
 """
 
-
 from __future__ import annotations
 from problem import OptProblem
 from node import Node
-from random import choice
+from random import choice, shuffle
 from time import time
+
+
+def random_reset(initial_state):
+    """Genera un estado inicial aleatorio para cada reinicio."""
+    # Implementa aquí la generación de un nuevo estado inicial aleatorio basado en el estado inicial original
+    # Puedes utilizar métodos o algoritmos adecuados según las características del problema
+    # Retorna el nuevo estado inicial generado
+
+    # Ejemplo: Generación aleatoria de un nuevo estado inicial permutando el estado inicial original
+    new_initial_state = initial_state[:]  # Copia del estado inicial original
+
+    # Permutar aleatoriamente el nuevo estado inicial
+    shuffle(new_initial_state)
+
+    return new_initial_state
 
 
 class LocalSearch:
@@ -79,7 +93,7 @@ class HillClimbing(LocalSearch):
                 self.tour = actual.state
                 self.value = actual.value
                 end = time()
-                self.time = end-start
+                self.time = end - start
                 return
 
             # Sino, moverse a un nodo con el estado sucesor
@@ -91,12 +105,110 @@ class HillClimbing(LocalSearch):
 
 
 class HillClimbingReset(LocalSearch):
-    """Algoritmo de ascension de colinas con reinicio aleatorio."""
+    """Clase que representa un algoritmo de ascenso de colinas con reinicios aleatorios.
 
-    # COMPLETAR
+    En cada iteración se mueve al estado sucesor con mejor valor objetivo.
+    Se realiza un reinicio aleatorio cuando se alcanza un óptimo local.
+    """
+
+    def solve(self, problem: OptProblem):
+        """Resuelve un problema de optimización con ascenso de colinas y reinicios aleatorios.
+
+        Argumentos:
+        ==========
+        problem: OptProblem
+            un problema de optimización
+        """
+        # Inicio del reloj
+        start = time()
+        max_restarts = 1
+        max_iters = 100
+        best_tour = None
+        best_value = float('-inf')
+
+        restarts = 0
+        while restarts < max_restarts:
+            # Crear el nodo inicial mediante un reinicio aleatorio
+            actual = Node(random_reset(problem.init), problem.obj_val(problem.init))
+
+            while True:
+                # Determinar las acciones que se pueden aplicar
+                # y las diferencias en valor objetivo que resultan
+                diff = problem.val_diff(actual.state)
+
+                # Buscar las acciones que generan el mayor incremento de valor objetivo
+                max_acts = [act for act, val in diff.items() if val == max(diff.values())]
+
+                # Elegir una acción aleatoria
+                act = choice(max_acts)
+
+                # Retornar si estamos en un óptimo local o se alcanzó el número máximo de iteraciones
+                if diff[act] <= 0 or self.niters >= max_iters:
+                    break
+
+                # Moverse a un nodo con el estado sucesor
+                actual = Node(problem.result(actual.state, act), actual.value + diff[act])
+                self.niters += 1
+
+            # Guardar la mejor solución encontrada en este reinicio
+            if actual.value > best_value:
+                best_tour = actual.state
+                best_value = actual.value
+
+            # Incrementar el contador de reinicios
+            restarts += 1
+
+        # Asignar la mejor solución encontrada a las variables de la instancia
+        self.tour = best_tour
+        self.value = best_value
+
+        # Finalizar el reloj
+        end = time()
+        self.time = end - start
 
 
 class Tabu(LocalSearch):
-    """Algoritmo de busqueda tabu."""
+    """Algoritmo de búsqueda tabú."""
 
-    # COMPLETAR
+    def solve(self, problem: OptProblem):
+        """Resuelve un problema de optimización con Búsqueda Tabú.
+
+        Argumentos:
+        ==========
+        problem: OptProblem
+            un problema de optimización
+        """
+        # Inicio del reloj
+        start = time()
+
+        lista_tabu = set()  # Utilizamos un conjunto para la lista tabú
+
+        actual = Node(problem.init, problem.obj_val(problem.init))
+        while True:
+
+            # Determinar las acciones que se pueden aplicar
+            # y las diferencias en valor objetivo que resultan
+            diff = problem.val_diff(actual.state)
+
+            # Buscar las acciones que generan el mayor incremento de valor objetivo y no estén en la lista Tabú
+            max_acts = [act for act, val in diff.items() if (val == max(diff.values())) and (val not in lista_tabu)]
+
+            if max_acts:
+                act = choice(max_acts)
+            else:
+                break
+
+            # Retornar si estamos en un óptimo local
+            if diff[act] <= 0:
+                self.tour = actual.state
+                self.value = actual.value
+                end = time()
+                self.time = end - start
+                return
+            else:
+                # Agregar movimiento a la lista Tabú
+                lista_tabu.add(act)
+
+                actual = Node(problem.result(actual.state, act),
+                              actual.value + diff[act])
+                self.niters += 1
