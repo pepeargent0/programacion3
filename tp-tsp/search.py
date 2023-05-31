@@ -206,7 +206,8 @@ class Tabu(LocalSearch):
         self.tabu_list_size = tabu_list_size
         self.max_iters = max_iters
 
-    def get_neighbors(self, state, problem, tabu_list):
+    @staticmethod
+    def get_neighbors(state, problem, tabu_list):
         """Obtiene los vecinos permitidos por las restricciones de la lista tabú.
 
         Argumentos:
@@ -252,10 +253,8 @@ class Tabu(LocalSearch):
         while iter_count < self.max_iters:
             # Obtener los vecinos permitidos por las restricciones de la lista tabú
             neighbors = self.get_neighbors(actual.state, problem, tabu_list)
-
             # Elegir el vecino con el mejor valor objetivo
             best_neighbor = max(neighbors, key=lambda x: x[1])
-
             # Retornar si estamos en un óptimo local
             if best_neighbor[1] <= actual.value:
                 self.tour = actual.state
@@ -266,19 +265,15 @@ class Tabu(LocalSearch):
             else:
                 # Moverse al vecino seleccionado
                 actual = Node(best_neighbor[0], best_neighbor[1])
-
                 # Agregar el movimiento a la lista Tabú
                 tabu_list.append(best_neighbor[0])
                 if len(tabu_list) > self.tabu_list_size:
                     tabu_list.pop(0)
-
                 iter_count += 1
                 self.niters += 1
-
         # Asignar la mejor solución encontrada a las variables de la instancia
         self.tour = actual.state
         self.value = actual.value
-
         # Finalizar el reloj
         end = time()
         self.time = end - start
