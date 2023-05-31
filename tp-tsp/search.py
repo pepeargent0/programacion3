@@ -111,7 +111,7 @@ class HillClimbingReset(LocalSearch):
     Se realiza un reinicio aleatorio cuando se alcanza un óptimo local.
     """
 
-    def solve(self, problem: OptProblem):
+    def solve(self, problem):
         """Resuelve un problema de optimización con ascenso de colinas y reinicios aleatorios.
 
         Argumentos:
@@ -129,17 +129,16 @@ class HillClimbingReset(LocalSearch):
         restarts = 0
         while restarts < max_restarts:
             # Crear el nodo inicial mediante un reinicio aleatorio
-            actual = Node(random_reset(problem.init), problem.obj_val(problem.init))
+            problem.random_reset()
+            actual = Node(problem.init, problem.obj_val(problem.init))
 
             while True:
                 # Determinar las acciones que se pueden aplicar
                 # y las diferencias en valor objetivo que resultan
                 diff = problem.val_diff(actual.state)
 
-                # Buscar las acciones que generan el mayor incremento de valor objetivo
+                # Elegir una acción aleatoria de las que generan el mayor incremento de valor objetivo
                 max_acts = [act for act, val in diff.items() if val == max(diff.values())]
-
-                # Elegir una acción aleatoria
                 act = choice(max_acts)
 
                 # Retornar si estamos en un óptimo local o se alcanzó el número máximo de iteraciones
@@ -150,27 +149,67 @@ class HillClimbingReset(LocalSearch):
                 actual = Node(problem.result(actual.state, act), actual.value + diff[act])
                 self.niters += 1
 
-            # Guardar la mejor solución encontrada en este reinicio
+                # Guardar la mejor solución encontrada en este reinicio
             if actual.value > best_value:
                 best_tour = actual.state
                 best_value = actual.value
 
-            # Incrementar el contador de reinicios
+                # Incrementar el contador de reinicios
             restarts += 1
 
-        # Asignar la mejor solución encontrada a las variables de la instancia
-        self.tour = best_tour
-        self.value = best_value
+            # Asignar la mejor solución encontrada a las variables de la instancia
+            self.tour = best_tour
+            self.value = best_value
 
-        # Finalizar el reloj
-        end = time()
-        self.time = end - start
+            # Finalizar el reloj
+            end = time()
+            self.time = end - start
 
 
 class Tabu(LocalSearch):
     """Algoritmo de búsqueda tabú."""
 
-    def solve(self, problem: OptProblem):
+    def __init__(self, tabu_list_size=4000, max_iters=10000):
+        """Construye una instancia de la clase Tabu.
+
+        Argumentos:
+        ==========
+        tabu_list_size: int
+            tamaño de la lista tabú
+        max_iters: int
+            número máximo de iteraciones
+        """
+        super().__init__()
+        self.tabu_list_size = tabu_list_size
+        self.max_iters = max_iters
+
+    def get_neighbors(self, state, problem, tabu_list):
+        """Obtiene los vecinos permitidos por las restricciones de la lista tabú.
+
+        Argumentos:
+        ==========
+        state: any
+            estado actual
+        problem: OptProblem
+            un problema de optimización
+        tabu_list: list
+            lista tabú que contiene los movimientos prohibidos
+
+        Retorna:
+        =======
+        list:
+            lista de vecinos permitidos junto con sus valores objetivo
+        """
+        neighbors = []
+        for action in problem.actions(state):
+            # Se verifica si el movimiento es permitido por las restricciones de la lista tabú
+            if action not in tabu_list:
+                neighbor_state = problem.result(state, action)
+                neighbor_value = problem.obj_val(neighbor_state)
+                neighbors.append((neighbor_state, neighbor_value))
+        return neighbors
+
+    def solve(self, problem):
         """Resuelve un problema de optimización con Búsqueda Tabú.
 
         Argumentos:
@@ -180,35 +219,40 @@ class Tabu(LocalSearch):
         """
         # Inicio del reloj
         start = time()
-
-        lista_tabu = set()  # Utilizamos un conjunto para la lista tabú
+        tabu_list = []
+        iter_count = 0
 
         actual = Node(problem.init, problem.obj_val(problem.init))
-        while True:
+        while iter_count < self.max_iters:
+            # Obtener los vecinos permitidos por las restricciones de la lista tabú
+            neighbors = self.get_neighbors(actual.state, problem, tabu_list)
 
-            # Determinar las acciones que se pueden aplicar
-            # y las diferencias en valor objetivo que resultan
-            diff = problem.val_diff(actual.state)
-
-            # Buscar las acciones que generan el mayor incremento de valor objetivo y no estén en la lista Tabú
-            max_acts = [act for act, val in diff.items() if (val == max(diff.values())) and (val not in lista_tabu)]
-
-            if max_acts:
-                act = choice(max_acts)
-            else:
-                break
+            # Elegir el vecino con el mejor valor objetivo
+            best_neighbor = max(neighbors, key=lambda x: x[1])
 
             # Retornar si estamos en un óptimo local
-            if diff[act] <= 0:
+            if best_neighbor[1] <= actual.value:
                 self.tour = actual.state
                 self.value = actual.value
                 end = time()
                 self.time = end - start
                 return
             else:
-                # Agregar movimiento a la lista Tabú
-                lista_tabu.add(act)
+                # Moverse al vecino seleccionado
+                actual = Node(best_neighbor[0], best_neighbor[1])
 
-                actual = Node(problem.result(actual.state, act),
-                              actual.value + diff[act])
+                # Agregar el movimiento a la lista Tabú
+                tabu_list.append(best_neighbor[0])
+                if len(tabu_list) > self.tabu_list_size:
+                    tabu_list.pop(0)
+
+                iter_count += 1
                 self.niters += 1
+
+        # Asignar la mejor solución encontrada a las variables de la instancia
+        self.tour = actual.state
+        self.value = actual.value
+
+        # Finalizar el reloj
+        end = time()
+        self.time = end - start
