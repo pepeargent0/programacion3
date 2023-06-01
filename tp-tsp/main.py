@@ -33,7 +33,7 @@ def main() -> None:
     algos = {
         HILL_CLIMBING: search.HillClimbing(),
         HILL_CLIMBING_RANDOM_RESET: search.HillClimbingReset(max_restarts=1),
-        TABU_SEARCH: search.Tabu(tabu_list_size=500, max_iters=5000)
+        TABU_SEARCH: search.Tabu(tabu_list_size=10, max_iters=40)
     }
 
     # Resolver el TSP con cada algoritmo

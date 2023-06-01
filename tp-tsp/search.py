@@ -79,24 +79,23 @@ class HillClimbing(LocalSearch):
 
 
 class HillClimbingReset(LocalSearch):
-    """Clase que representa un algoritmo de ascenso de colinas con reinicios aleatorios.
-
+    """
+    Clase que representa un algoritmo de ascenso de colinas con reinicios aleatorios.
     En cada iteración se mueve al estado sucesor con mejor valor objetivo.
     Se realiza un reinicio aleatorio cuando se alcanza un óptimo local.
     """
-    def __init__(self, max_restarts=None, max_iters=None):
+
+    def __init__(self, max_restarts=3):
         """
         Construye una instancia de la clase HillClimbingReset.
         Argumentos:
         ==========
-        max_restarts: int maximo numero de restarts (por defecto, None)
-        max_iters: int número máximo de iteraciones (por defecto, None)
+        max_restarts: int máximo número de reinicios (por defecto, 3)
         """
         super().__init__()
         self.max_restarts = max_restarts
-        self.max_iters = max_iters
 
-    def solve(self, problem):
+    def solve(self, problem: OptProblem):
         """
         Resuelve un problema de optimización con ascenso de colinas y reinicios aleatorios.
         Argumentos:
@@ -105,10 +104,8 @@ class HillClimbingReset(LocalSearch):
         """
         # Inicio del reloj
         start = time()
-        if self.max_restarts is None:
-            self.max_restarts = 3
-        if self.max_iters is None:
-            self.max_iters = len(problem.init)
+        # Configurar el número máximo de iteraciones por reinicio
+        max_iters = len(problem.init)
         best_tour = None
         best_value = float('-inf')
         restarts = 0
@@ -117,7 +114,7 @@ class HillClimbingReset(LocalSearch):
             problem.random_reset()
             actual = Node(problem.init, problem.obj_val(problem.init))
             no_improvement_count = 0
-            while no_improvement_count < self.max_iters:
+            while no_improvement_count < max_iters:
                 # Determinar las acciones que se pueden aplicar y las diferencias en valor objetivo que resultan
                 diff = problem.val_diff(actual.state)
                 # Elegir una acción aleatoria de las que generan incremento positivo en el valor objetivo
@@ -150,6 +147,7 @@ class HillClimbingReset(LocalSearch):
         # Finalizar el reloj
         end = time()
         self.time = end - start
+
 
 
 class Tabu(LocalSearch):
