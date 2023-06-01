@@ -113,7 +113,8 @@ class HillClimbingReset(LocalSearch):
         restarts = 0
         while restarts < self.max_restarts:
             # Crear el nodo inicial mediante un reinicio aleatorio
-            problem.random_reset()
+            if restarts != 0:
+                problem.random_reset()
             actual = Node(problem.init, problem.obj_val(problem.init))
             no_improvement_count = 0
             while no_improvement_count < max_iters:
@@ -139,10 +140,8 @@ class HillClimbingReset(LocalSearch):
             if actual.value > best_value:
                 best_tour = actual.state
                 best_value = actual.value
-
             # Incrementar el contador de reinicios
             restarts += 1
-
         # Asignar la mejor solución encontrada a las variables de la instancia
         self.tour = best_tour
         self.value = best_value
