@@ -75,19 +75,15 @@ class OptProblem:
 
 class TSP(OptProblem):
     """Subclase que representa al Problema del Viajante (TSP).
-
     Un estado es una lista de enteros: list[int].
     Una accion es un par de enteros: tuple[int,int].
     """
 
     def __init__(self, G: Graph) -> None:
         """Construye una instancia de TSP.
-
         Argumentos:
         ==========
-        G: Graph
-            grafo con los datos del problema
-            los nodos del grafo se enumeran de 1 a n, ¡cuidado!
+        G: Graph grafo con los datos del problema los nodos del grafo se enumeran de 1 a n, ¡cuidado!
         """
         self.G = G
         self.init = [i for i in range(0, G.number_of_nodes())]
@@ -98,9 +94,7 @@ class TSP(OptProblem):
 
         Argumentos:
         ==========
-        state: list[int]
-            un estado
-
+        state: list[int] un estado
         Retorno:
         =======
         act: list[tuple[int, int]]
@@ -135,16 +129,12 @@ class TSP(OptProblem):
 
     def obj_val(self, state: list[int]) -> float:
         """Determina el valor objetivo de un estado.
-
         Argumentos:
         ==========
-        state: list[int]
-            un estado
-
+        state: list[int] un estado
         Retorno:
         =======
-        value: float
-            valor objetivo
+        value: float valor objetivo
         """
         value = 0
         for i in range(0, self.G.number_of_nodes()):

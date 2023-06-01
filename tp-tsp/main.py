@@ -30,9 +30,11 @@ def main() -> None:
     p = problem.TSP(G)
 
     # Construir las instancias de los algoritmos
-    algos = {HILL_CLIMBING: search.HillClimbing(),
-             HILL_CLIMBING_RANDOM_RESET: search.HillClimbingReset(),
-             TABU_SEARCH: search.Tabu()}
+    algos = {
+        HILL_CLIMBING: search.HillClimbing(),
+        HILL_CLIMBING_RANDOM_RESET: search.HillClimbingReset(max_restarts=1),
+        TABU_SEARCH: search.Tabu(tabu_list_size=500, max_iters=5000)
+    }
 
     # Resolver el TSP con cada algoritmo
     for algo in algos.values():

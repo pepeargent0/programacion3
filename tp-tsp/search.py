@@ -22,21 +22,6 @@ from random import choice, shuffle
 from time import time
 
 
-def random_reset(initial_state):
-    """Genera un estado inicial aleatorio para cada reinicio."""
-    # Implementa aquí la generación de un nuevo estado inicial aleatorio basado en el estado inicial original
-    # Puedes utilizar métodos o algoritmos adecuados según las características del problema
-    # Retorna el nuevo estado inicial generado
-
-    # Ejemplo: Generación aleatoria de un nuevo estado inicial permutando el estado inicial original
-    new_initial_state = initial_state[:]  # Copia del estado inicial original
-
-    # Permutar aleatoriamente el nuevo estado inicial
-    shuffle(new_initial_state)
-
-    return new_initial_state
-
-
 class LocalSearch:
     """Clase que representa un algoritmo de busqueda local general."""
 
@@ -70,37 +55,26 @@ class HillClimbing(LocalSearch):
         """
         # Inicio del reloj
         start = time()
-
         # Crear el nodo inicial
         actual = Node(problem.init, problem.obj_val(problem.init))
-
         while True:
-
             # Determinar las acciones que se pueden aplicar
             # y las diferencias en valor objetivo que resultan
             diff = problem.val_diff(actual.state)
-
             # Buscar las acciones que generan el  mayor incremento de valor obj
-            max_acts = [act for act, val in diff.items() if val ==
-                        max(diff.values())]
-
+            max_acts = [act for act, val in diff.items() if val == max(diff.values())]
             # Elegir una accion aleatoria
             act = choice(max_acts)
-
             # Retornar si estamos en un optimo local
             if diff[act] <= 0:
-
                 self.tour = actual.state
                 self.value = actual.value
                 end = time()
                 self.time = end - start
                 return
-
             # Sino, moverse a un nodo con el estado sucesor
             else:
-
-                actual = Node(problem.result(actual.state, act),
-                              actual.value + diff[act])
+                actual = Node(problem.result(actual.state, act), actual.value + diff[act])
                 self.niters += 1
 
 
@@ -111,26 +85,23 @@ class HillClimbingReset(LocalSearch):
     Se realiza un reinicio aleatorio cuando se alcanza un óptimo local.
     """
     def __init__(self, max_restarts=None, max_iters=None):
-        """Construye una instancia de la clase Tabu.
-
+        """
+        Construye una instancia de la clase HillClimbingReset.
         Argumentos:
         ==========
-        max_restarts: int
-            maximo numero de restarts (por defecto, None)
-        max_iters: int
-            número máximo de iteraciones (por defecto, None)
+        max_restarts: int maximo numero de restarts (por defecto, None)
+        max_iters: int número máximo de iteraciones (por defecto, None)
         """
         super().__init__()
         self.max_restarts = max_restarts
         self.max_iters = max_iters
 
     def solve(self, problem):
-        """Resuelve un problema de optimización con ascenso de colinas y reinicios aleatorios.
-
+        """
+        Resuelve un problema de optimización con ascenso de colinas y reinicios aleatorios.
         Argumentos:
         ==========
-        problem: OptProblem
-            un problema de optimización
+        problem: OptProblem un problema de optimización
         """
         # Inicio del reloj
         start = time()
@@ -140,30 +111,24 @@ class HillClimbingReset(LocalSearch):
             self.max_iters = len(problem.init)
         best_tour = None
         best_value = float('-inf')
-
         restarts = 0
         while restarts < self.max_restarts:
             # Crear el nodo inicial mediante un reinicio aleatorio
             problem.random_reset()
             actual = Node(problem.init, problem.obj_val(problem.init))
             no_improvement_count = 0
-
             while no_improvement_count < self.max_iters:
-                # Determinar las acciones que se pueden aplicar
-                # y las diferencias en valor objetivo que resultan
+                # Determinar las acciones que se pueden aplicar y las diferencias en valor objetivo que resultan
                 diff = problem.val_diff(actual.state)
-
                 # Elegir una acción aleatoria de las que generan incremento positivo en el valor objetivo
                 positive_diff_acts = [act for act, val in diff.items() if val > 0]
                 if positive_diff_acts:
                     act = choice(positive_diff_acts)
                 else:
                     break
-
                 # Moverse a un nodo con el estado sucesor
                 actual = Node(problem.result(actual.state, act), actual.value + diff[act])
                 self.niters += 1
-
                 # Verificar si se ha encontrado una solución mejor
                 if actual.value > best_value:
                     best_tour = actual.state
@@ -171,7 +136,6 @@ class HillClimbingReset(LocalSearch):
                     no_improvement_count = 0
                 else:
                     no_improvement_count += 1
-
             # Guardar la mejor solución encontrada en este reinicio
             if actual.value > best_value:
                 best_tour = actual.state
@@ -183,7 +147,6 @@ class HillClimbingReset(LocalSearch):
         # Asignar la mejor solución encontrada a las variables de la instancia
         self.tour = best_tour
         self.value = best_value
-
         # Finalizar el reloj
         end = time()
         self.time = end - start
@@ -191,16 +154,12 @@ class HillClimbingReset(LocalSearch):
 
 class Tabu(LocalSearch):
     """Algoritmo de búsqueda tabú."""
-
     def __init__(self, tabu_list_size=None, max_iters=None):
         """Construye una instancia de la clase Tabu.
-
         Argumentos:
         ==========
-        tabu_list_size: int
-            tamaño de la lista tabú (por defecto, None)
-        max_iters: int
-            número máximo de iteraciones (por defecto, None)
+        tabu_list_size: int tamaño de la lista tabú (por defecto, None)
+        max_iters: int número máximo de iteraciones (por defecto, None)
         """
         super().__init__()
         self.tabu_list_size = tabu_list_size
@@ -208,21 +167,16 @@ class Tabu(LocalSearch):
 
     @staticmethod
     def get_neighbors(state, problem, tabu_list):
-        """Obtiene los vecinos permitidos por las restricciones de la lista tabú.
-
+        """
+        Obtiene los vecinos permitidos por las restricciones de la lista tabú.
         Argumentos:
         ==========
-        state: any
-            estado actual
-        problem: OptProblem
-            un problema de optimización
-        tabu_list: list
-            lista tabú que contiene los movimientos prohibidos
-
+        state: any estado actual
+        problem: OptProblem un problema de optimización
+        tabu_list: list lista tabú que contiene los movimientos prohibidos
         Retorna:
         =======
-        list:
-            lista de vecinos permitidos junto con sus valores objetivo
+        list: lista de vecinos permitidos junto con sus valores objetivo
         """
         neighbors = []
         for action in problem.actions(state):
@@ -234,12 +188,11 @@ class Tabu(LocalSearch):
         return neighbors
 
     def solve(self, problem):
-        """Resuelve un problema de optimización con Búsqueda Tabú.
-
+        """
+        Resuelve un problema de optimización con Búsqueda Tabú.
         Argumentos:
         ==========
-        problem: OptProblem
-            un problema de optimización
+        problem: OptProblem un problema de optimización
         """
         # Inicio del reloj
         start = time()

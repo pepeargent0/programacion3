@@ -11,16 +11,13 @@ Action = TypeVar('Action')
 
 class Node:
     """Clase que representa un nodo para busqueda local."""
-
     def __init__(self, state: State, value: float) -> None:
         """Construye una instancia de la clase.
 
         Argumentos:
         ==========
-        state: State
-            un estado
-        value: float
-            un valor objetivo
+        state: Stateun estado
+        value: float un valor objetivo
         """
         self.state = state
         self.value = value
