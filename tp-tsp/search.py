@@ -111,17 +111,21 @@ class HillClimbingReset(LocalSearch):
         best_tour = None
         best_value = float('-inf')
         restarts = 0
+        self.niters = 0  # Reiniciar el contador de iteraciones
+
         while restarts < self.max_restarts:
             # Crear el nodo inicial mediante un reinicio aleatorio
             if restarts != 0:
                 problem.random_reset()
             no_improvement_count = 0
             actual = Node(problem.init, problem.obj_val(problem.init))
+
             while no_improvement_count < self.max_iters:
                 # Determinar las acciones que se pueden aplicar y las diferencias en valor objetivo que resultan
                 diff = problem.val_diff(actual.state)
                 # Elegir una acción aleatoria de las que generan incremento positivo en el valor objetivo
                 positive_diff_acts = [act for act, val in diff.items() if val > 0]
+
                 if positive_diff_acts:
                     act = choice(positive_diff_acts)
                     # Moverse a un nodo con el estado sucesor
@@ -130,14 +134,21 @@ class HillClimbingReset(LocalSearch):
                     if actual.value > best_value:
                         best_tour = actual.state
                         best_value = actual.value
+                        no_improvement_count = 0  # Reiniciar el contador de iteraciones sin mejora
+                    else:
+                        no_improvement_count += 1
+
                     self.niters += 1
                 else:
                     break
+
             # Incrementar el contador de reinicios
             restarts += 1
+
         # Asignar la mejor solución encontrada a las variables de la instancia
         self.tour = best_tour
         self.value = best_value
+
         # Finalizar el reloj
         end = time()
         self.time = end - start
