@@ -15,7 +15,8 @@ import problem
 HILL_CLIMBING = "hill"
 HILL_CLIMBING_RANDOM_RESET = "hill_reset"
 TABU_SEARCH = "tabu"
-ALGO_NAMES = [HILL_CLIMBING, HILL_CLIMBING_RANDOM_RESET, TABU_SEARCH]
+HILL_CLIMBING_RANDOM_RESET_ESTOCASTICO = "hill_reset_estocastico"
+ALGO_NAMES = [HILL_CLIMBING, HILL_CLIMBING_RANDOM_RESET, HILL_CLIMBING_RANDOM_RESET_ESTOCASTICO , TABU_SEARCH]
 
 
 def main() -> None:
@@ -33,8 +34,8 @@ def main() -> None:
     algos = {
         HILL_CLIMBING: search.HillClimbing(),
         TABU_SEARCH: search.Tabu(tabu_list_size=50, max_iters=50),
-        HILL_CLIMBING_RANDOM_RESET: search.HillClimbingReset(max_restarts=1, max_iters=33),
-        
+        HILL_CLIMBING_RANDOM_RESET: search.HillClimbingReset(max_restarts=1, max_iters=33333),
+        HILL_CLIMBING_RANDOM_RESET_ESTOCASTICO: search.HillClimbingResetEstocastico(max_restarts=1, max_iters=38883)
     }
     # Graficar los tours
     tours = {}

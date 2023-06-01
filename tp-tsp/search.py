@@ -79,8 +79,80 @@ class HillClimbing(LocalSearch):
                 actual = Node(problem.result(actual.state, act), actual.value + diff[act])
                 self.niters += 1
 
-
 class HillClimbingReset(LocalSearch):
+    """
+    Clase que representa un algoritmo de ascenso de colinas con reinicios aleatorios.
+    En cada iteración se mueve al estado sucesor con mejor valor objetivo.
+    Se realiza un reinicio aleatorio cuando se alcanza un óptimo local.
+    """
+
+    def __init__(self, max_restarts:int=3, max_iters:int=10):
+        """
+        Construye una instancia de la clase HillClimbingReset.
+        Argumentos:
+        ==========
+        max_restarts: int máximo número de reinicios (por defecto, 3)
+        max_iters: int numero maximo de interaciones (por defecto 10)
+        """
+        super().__init__()
+        self.max_restarts = max_restarts
+        self.max_iters = max_iters
+
+    def solve(self, problem: OptProblem):
+        """
+        Resuelve un problema de optimización con ascenso de colinas y reinicios aleatorios.
+        Argumentos:
+        ==========
+        problem: OptProblem un problema de optimización
+        """
+        # Inicio del reloj
+        start = time()
+        best_tour = None
+        best_value = float('-inf')
+        restarts = 0
+        self.niters = 0  # Reiniciar el contador de iteraciones
+
+        while restarts < self.max_restarts:
+            # Crear el nodo inicial mediante un reinicio aleatorio
+            if restarts != 0:
+                problem.random_reset()
+            no_improvement_count = 0
+            actual = Node(problem.init, problem.obj_val(problem.init))
+
+            while no_improvement_count < self.max_iters:
+                # Determinar las acciones que se pueden aplicar y las diferencias en valor objetivo que resultan
+                diff = problem.val_diff(actual.state)
+                # Elegir una acción aleatoria de las que generan incremento positivo en el valor objetivo
+                
+                positive_diff_acts = [act for act, val in diff.items() if val == max(diff.values())]
+                if positive_diff_acts:
+                    act = choice(positive_diff_acts)
+                    # Moverse a un nodo con el estado sucesor
+                    actual = Node(problem.result(actual.state, act), actual.value + diff[act])
+                    # Guardar la mejor solución encontrada en este reinicio
+                    if actual.value > best_value:
+                        best_tour = actual.state
+                        best_value = actual.value
+                        no_improvement_count = 0  # Reiniciar el contador de iteraciones sin mejora
+                    else:
+                        no_improvement_count += 1
+
+                    self.niters += 1
+                else:
+                    break
+
+            # Incrementar el contador de reinicios
+            restarts += 1
+
+        # Asignar la mejor solución encontrada a las variables de la instancia
+        self.tour = best_tour
+        self.value = best_value
+
+        # Finalizar el reloj
+        end = time()
+        self.time = end - start
+
+class HillClimbingResetEstocastico(LocalSearch):
     """
     Clase que representa un algoritmo de ascenso de colinas con reinicios aleatorios.
     En cada iteración se mueve al estado sucesor con mejor valor objetivo.
