@@ -87,7 +87,7 @@ class HillClimbingReset(LocalSearch):
     Se realiza un reinicio aleatorio cuando se alcanza un óptimo local.
     """
 
-    def __init__(self, max_restarts:int =3, max_iters:int = 10):
+    def __init__(self, max_restarts:int=3, max_iters:int=10):
         """
         Construye una instancia de la clase HillClimbingReset.
         Argumentos:
@@ -126,20 +126,13 @@ class HillClimbingReset(LocalSearch):
                     act = choice(positive_diff_acts)
                     # Moverse a un nodo con el estado sucesor
                     actual = Node(problem.result(actual.state, act), actual.value + diff[act])
+                    # Guardar la mejor solución encontrada en este reinicio
+                    if actual.value > best_value:
+                        best_tour = actual.state
+                        best_value = actual.value
                     self.niters += 1
                 else:
                     break
-                # Verificar si se ha encontrado una solución mejor
-                if actual.value > best_value:
-                    best_tour = actual.state
-                    best_value = actual.value
-                    no_improvement_count = 0
-                else:
-                    no_improvement_count += 1
-            # Guardar la mejor solución encontrada en este reinicio
-            if actual.value > best_value:
-                best_tour = actual.state
-                best_value = actual.value
             # Incrementar el contador de reinicios
             restarts += 1
         # Asignar la mejor solución encontrada a las variables de la instancia
