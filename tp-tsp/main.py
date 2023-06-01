@@ -32,10 +32,14 @@ def main() -> None:
     # Construir las instancias de los algoritmos
     algos = {
         HILL_CLIMBING: search.HillClimbing(),
+        TABU_SEARCH: search.Tabu(tabu_list_size=50, max_iters=100),
         HILL_CLIMBING_RANDOM_RESET: search.HillClimbingReset(max_restarts=1),
-        TABU_SEARCH: search.Tabu(tabu_list_size=10, max_iters=40)
+        
     }
-
+    # Graficar los tours
+    tours = {}
+    tours['init'] = (p.init, p.obj_val(p.init))  # estado inicial
+    
     # Resolver el TSP con cada algoritmo
     for algo in algos.values():
         algo.solve(p)
@@ -45,9 +49,7 @@ def main() -> None:
     for name, algo in algos.items():
         print(algo.value, "%.2f" % algo.time, algo.niters, name, sep="\t\t")
 
-    # Graficar los tours
-    tours = {}
-    tours['init'] = (p.init, p.obj_val(p.init))  # estado inicial
+    
     for name, algo in algos.items():
         tours[name] = (algo.tour, algo.value)
     plot.show(G, coords, args.filename, tours)

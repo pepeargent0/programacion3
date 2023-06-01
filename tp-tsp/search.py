@@ -57,6 +57,7 @@ class HillClimbing(LocalSearch):
         start = time()
         # Crear el nodo inicial
         actual = Node(problem.init, problem.obj_val(problem.init))
+        
         while True:
             # Determinar las acciones que se pueden aplicar
             # y las diferencias en valor objetivo que resultan
@@ -66,6 +67,7 @@ class HillClimbing(LocalSearch):
             # Elegir una accion aleatoria
             act = choice(max_acts)
             # Retornar si estamos en un optimo local
+           
             if diff[act] <= 0:
                 self.tour = actual.state
                 self.value = actual.value
