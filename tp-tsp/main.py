@@ -33,20 +33,20 @@ def main() -> None:
     # Construir las instancias de los algoritmos
     algos = {
         HILL_CLIMBING: search.HillClimbing(),
-        TABU_SEARCH: search.Tabu(tabu_list_size=20),
+        TABU_SEARCH: search.Tabu(),
         HILL_CLIMBING_RANDOM_RESET: search.HillClimbingReset(
             max_restarts=2,
-            max_iters=2,
+            max_iters=20,
             rest='no_estocastico'),
-        HILL_CLIMBING_RANDOM_RESET_ESTOCASTICO: search.HillClimbingReset(max_restarts=2, max_iters=400)
+        HILL_CLIMBING_RANDOM_RESET_ESTOCASTICO: search.HillClimbingReset(max_restarts=2, max_iters=40)
     }
     # BUSQUEDA TABU PAREMATROS
-    # search.Tabu(tabu_list_size=4, max_iters=2) ar24.tsp
-    # search.Tabu(tabu_list_size=4, max_iters=2) att48.tsp
-    # search.Tabu(tabu_list_size=4, max_iters=2) berlin52.tsp -3461 0.00 4 tabu
-    # search.Tabu(tabu_list_size=4, max_iters=2) burma14.tsp -3461 0.00 4 tabu
-    # search.Tabu(tabu_list_size=4, max_iters=2) pr76.tsp -3461 0.00 4 tabu
-    # search.Tabu(tabu_list_size=4, max_iters=2) ulysses16.tsp -3461 0.00 4 tabu
+    # search.Tabu(tabu_list_size=4) ar24.tsp
+    # search.Tabu(tabu_list_size=4) att48.tsp
+    # search.Tabu() berlin52.tsp
+    # search.Tabu() burma14.tsp
+    # search.Tabu() pr76.tsp
+    # search.Tabu() ulysses16.tsp
     # Graficar los tours
     tours = {'init': (p.init, p.obj_val(p.init))}
 

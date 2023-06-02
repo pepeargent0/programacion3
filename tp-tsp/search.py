@@ -202,7 +202,7 @@ class Tabu(LocalSearch):
         start = time()
         tabu_list = []
         if self.tabu_list_size is None:
-            self.tabu_list_size = int(len(problem.init) * 0.2)
+            self.tabu_list_size = int(len(problem.init) * 0.30)
         if self.max_iters is None:
             self.max_iters = len(problem.init)
         iter_count = 0
