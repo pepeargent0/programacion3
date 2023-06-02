@@ -34,8 +34,8 @@ def main() -> None:
     algos = {
         HILL_CLIMBING: search.HillClimbing(),
         TABU_SEARCH: search.Tabu(tabu_list_size=50, max_iters=50),
-        HILL_CLIMBING_RANDOM_RESET: search.HillClimbingReset(max_restarts=1, max_iters=33333),
-        HILL_CLIMBING_RANDOM_RESET_ESTOCASTICO: search.HillClimbingResetEstocastico(max_restarts=1, max_iters=38883)
+        HILL_CLIMBING_RANDOM_RESET: search.HillClimbingReset(max_restarts=2, max_i_sin_mejoras=400),
+        HILL_CLIMBING_RANDOM_RESET_ESTOCASTICO: search.HillClimbingResetEstocastico(max_restarts=1, max_iters=400)
     }
     # Graficar los tours
     tours = {}

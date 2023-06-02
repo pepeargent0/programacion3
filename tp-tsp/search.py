@@ -86,7 +86,7 @@ class HillClimbingReset(LocalSearch):
     Se realiza un reinicio aleatorio cuando se alcanza un óptimo local.
     """
 
-    def __init__(self, max_restarts:int=3, max_iters:int=10):
+    def __init__(self, max_restarts:int=3, max_i_sin_mejoras:int=10):
         """
         Construye una instancia de la clase HillClimbingReset.
         Argumentos:
@@ -96,7 +96,7 @@ class HillClimbingReset(LocalSearch):
         """
         super().__init__()
         self.max_restarts = max_restarts
-        self.max_iters = max_iters
+        self.max_i_sin_mejoras = max_i_sin_mejoras
 
     def solve(self, problem: OptProblem):
         """
@@ -119,7 +119,7 @@ class HillClimbingReset(LocalSearch):
             no_improvement_count = 0
             actual = Node(problem.init, problem.obj_val(problem.init))
 
-            while no_improvement_count < self.max_iters:
+            while no_improvement_count < self.max_i_sin_mejoras:
                 # Determinar las acciones que se pueden aplicar y las diferencias en valor objetivo que resultan
                 diff = problem.val_diff(actual.state)
                 # Elegir una acción aleatoria de las que generan incremento positivo en el valor objetivo
@@ -224,8 +224,6 @@ class HillClimbingResetEstocastico(LocalSearch):
         # Finalizar el reloj
         end = time()
         self.time = end - start
-
-
 
 class Tabu(LocalSearch):
     """Algoritmo de búsqueda tabú."""
