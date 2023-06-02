@@ -1,4 +1,5 @@
-"""Este modulo define la clase LocalSearch.
+"""
+Este modulo define la clase LocalSearch.
 
 LocalSearch representa un algoritmo de busqueda local general.
 
@@ -16,10 +17,16 @@ No viene implementado, se debe completar.
 """
 
 from __future__ import annotations
-from problem import OptProblem
+
+from typing import Optional, List
+
+from problem import OptProblem, State
 from node import Node
-from random import choice
+from random import choice, sample
 from time import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class LocalSearch:
@@ -90,8 +97,6 @@ class HillClimbingReset(LocalSearch):
     def __init__(self, max_restarts: int = 3, max_iters: int = 10, rest: str = 'estocastico'):
         """
         Construye una instancia de la clase HillClimbingReset.
-        Argumentos:
-        ==========
         max_restarts: int máximo número de reinicios (por defecto, 3)
         max_iters: int numero maximo de interaciones (por defecto 10)
         """
@@ -107,61 +112,66 @@ class HillClimbingReset(LocalSearch):
         ==========
         problem: OptProblem un problema de optimización
         """
-        # Inicio del reloj
-        start = time()
-        best_tour = None
-        best_value = float('-inf')
-        restarts = 0
-        self.niters = 0  # Reiniciar el contador de iteraciones
+        try:
+            # Inicio del reloj
+            start = time()
+            best_tour = None
+            best_value = float('-inf')
+            restarts = 0
+            self.niters = 0  # Reiniciar el contador de iteraciones
 
-        while restarts < self.max_restarts:
-            # Crear el nodo inicial mediante un reinicio aleatorio
-            if restarts != 0:
-                problem.random_reset()
-            no_improvement_count = 0
-            actual = Node(problem.init, problem.obj_val(problem.init))
+            while restarts < self.max_restarts:
+                # Crear el nodo inicial mediante un reinicio aleatorio
+                if restarts != 0:
+                    problem.random_reset()
+                no_improvement_count = 0
+                actual = Node(problem.init, problem.obj_val(problem.init))
 
-            while self.max_iters > no_improvement_count:
-                # Determinar las acciones que se pueden aplicar y las diferencias en valor objetivo que resultan
-                diff = problem.val_diff(actual.state)
-                # Elegir una acción aleatoria de las que generan incremento positivo en el valor objetivo
+                while self.max_iters > no_improvement_count:
+                    # Determinar las acciones que se pueden aplicar y las diferencias en valor objetivo que resultan
+                    diff = problem.val_diff(actual.state)
+                    # Elegir una acción aleatoria de las que generan incremento positivo en el valor objetivo
 
-                if self.type_reset == 'estocastico':
-                    positive_diff_acts = [act for act, val in diff.items() if val > 0]
-                else:
-                    positive_diff_acts = [act for act, val in diff.items() if val == max(diff.values())]
-
-                if positive_diff_acts:
-                    act = choice(positive_diff_acts)
-                    # Moverse a un nodo con el estado sucesor
-                    actual = Node(problem.result(actual.state, act), actual.value + diff[act])
-                    # Guardar la mejor solución encontrada en este reinicio
-                    if actual.value > best_value:
-                        best_tour = actual.state
-                        best_value = actual.value
-                        no_improvement_count = 0  # Reiniciar el contador de iteraciones sin mejora
+                    if self.type_reset == 'estocastico':
+                        positive_diff_acts = [act for act, val in diff.items() if val > 0]
                     else:
-                        no_improvement_count += 1
-                    self.niters += 1
-                else:
-                    break
-            # Incrementar el contador de reinicios
-            restarts += 1
-        # Asignar la mejor solución encontrada a las variables de la instancia
-        self.tour = best_tour
-        self.value = best_value
-        # Finalizar el reloj
-        end = time()
-        self.time = end - start
+                        positive_diff_acts = [act for act, val in diff.items() if val == max(diff.values())]
+
+                    if positive_diff_acts:
+                        act = choice(positive_diff_acts)
+                        # Moverse a un nodo con el estado sucesor
+                        actual = Node(problem.result(actual.state, act), actual.value + diff[act])
+                        # Guardar la mejor solución encontrada en este reinicio
+                        if actual.value > best_value:
+                            best_tour = actual.state
+                            best_value = actual.value
+                            no_improvement_count = 0  # Reiniciar el contador de iteraciones sin mejora
+                        else:
+                            no_improvement_count += 1
+                        self.niters += 1
+                    else:
+                        break
+                # Incrementar el contador de reinicios
+                restarts += 1
+            # Asignar la mejor solución encontrada a las variables de la instancia
+            self.tour = best_tour
+            self.value = best_value
+            # Finalizar el reloj
+            end = time()
+            self.time = end - start
+        except Exception as e:
+            logger.error(f"Se produjo un error en el método solve: ERROR={e}", exc_info=True)
+            self.tour = None
+            self.value = None
+            self.time = None
 
 
 class Tabu(LocalSearch):
     """Algoritmo de búsqueda tabú."""
 
     def __init__(self, tabu_list_size=None, max_iters=None):
-        """Construye una instancia de la clase Tabu.
-        Argumentos:
-        ==========
+        """
+        Construye una instancia de la clase Tabu.
         tabu_list_size: int tamaño de la lista tabú (por defecto, None)
         max_iters: int número máximo de iteraciones (por defecto, None)
         """
@@ -170,67 +180,100 @@ class Tabu(LocalSearch):
         self.max_iters = max_iters
 
     @staticmethod
-    def get_neighbors(state, problem, tabu_list):
+    def get_neighbors(
+            state: State,
+            problem: OptProblem,
+            tabu_list: Optional[List[State]] = None
+    ) -> List[Node]:
         """
         Obtiene los vecinos permitidos por las restricciones de la lista tabú.
-        Argumentos:
-        ==========
-        state: any estado actual
+        state: estado actual
         problem: OptProblem un problema de optimización
         tabu_list: list lista tabú que contiene los movimientos prohibidos
-        Retorna:
-        =======
+        Return
         list: lista de vecinos permitidos junto con sus valores objetivo
         """
         neighbors = []
-        for action in problem.actions(state):
-            # Se verifica si el movimiento es permitido por las restricciones de la lista tabú
-            if action not in tabu_list:
-                neighbor_state = problem.result(state, action)
-                neighbor_value = problem.obj_val(neighbor_state)
-                neighbors.append((neighbor_state, neighbor_value))
+        try:
+            for action in problem.actions(state):
+                # Se verifica si el movimiento es permitido por las restricciones de la lista tabú
+                if action not in tabu_list:
+                    # Se obtiene el estado vecino aplicando la acción al estado actual
+                    neighbor_state = problem.result(state, action)
+                    # Se calcula el valor objetivo del estado vecino
+                    neighbor_value = problem.obj_val(neighbor_state)
+                    # Se agrega el vecino (estado y valor objetivo) a la lista de vecinos permitidos
+                    neighbors.append(Node(neighbor_state, neighbor_value))
+        except Exception as e:
+            logger.error(f"Se produjo un error al obtener los vecinos permitidos error={e}", exc_info=True)
+            return []
+        # Se devuelve la lista de vecinos permitidos junto con sus valores objetivo
         return neighbors
 
-    def solve(self, problem):
+    @classmethod
+    def remove_elements_random(cls, tabu_list: List[State]) -> List[State]:
+        """
+        Elimina elementos aleatorios en la lista Tabú.
+        tabu_list: List[State] - Lista Tabú que contiene los elementos a eliminar.
+        Return
+        List[State]: Lista Tabú modificada después de eliminar elementos aleatorios.
+        """
+        try:
+            if len(tabu_list) > cls.tabu_list_size:
+                indices = sample(range(len(tabu_list)), len(tabu_list) - cls.tabu_list_size)
+                tabu_list = [tabu_list[i] for i in range(len(tabu_list)) if i not in indices]
+            return tabu_list
+        except Exception as e:
+            logger.error(f"Se produjo un error al eliminar elementos de la lista Tabú: {e}", exc_info=True)
+            return []
+
+    def solve(self, problem: OptProblem):
         """
         Resuelve un problema de optimización con Búsqueda Tabú.
         Argumentos:
         ==========
-        problem: OptProblem un problema de optimización
+        problem: OptProblem - Un problema de optimización.
         """
-        # Inicio del reloj
-        start = time()
-        tabu_list = []
-        if self.tabu_list_size is None:
-            self.tabu_list_size = int(len(problem.init) * 0.30)
-        if self.max_iters is None:
-            self.max_iters = len(problem.init)
-        iter_count = 0
-        actual = Node(problem.init, problem.obj_val(problem.init))
-        while iter_count < self.max_iters:
-            # Obtener los vecinos permitidos por las restricciones de la lista tabú
-            neighbors = self.get_neighbors(actual.state, problem, tabu_list)
-            # Elegir el vecino con el mejor valor objetivo
-            best_neighbor = max(neighbors, key=lambda x: x[1])
-            # Retornar si estamos en un óptimo local
-            if best_neighbor[1] <= actual.value:
-                self.tour = actual.state
-                self.value = actual.value
-                end = time()
-                self.time = end - start
-                return
-            else:
-                # Moverse al vecino seleccionado
-                actual = Node(best_neighbor[0], best_neighbor[1])
-                # Agregar el movimiento a la lista Tabú
-                tabu_list.append(best_neighbor[0])
-                if len(tabu_list) > self.tabu_list_size:
-                    tabu_list.pop(0)
-                iter_count += 1
-                self.niters += 1
-        # Asignar la mejor solución encontrada a las variables de la instancia
-        self.tour = actual.state
-        self.value = actual.value
-        # Finalizar el reloj
-        end = time()
-        self.time = end - start
+        try:
+            # Inicio del reloj
+            start = time()
+            tabu_list = []
+            if self.tabu_list_size is None:
+                self.tabu_list_size = int(len(problem.init) * 0.30)
+            if self.max_iters is None:
+                self.max_iters = len(problem.init)
+            iter_count = 0
+            actual = Node(problem.init, problem.obj_val(problem.init))
+            while iter_count < self.max_iters:
+                # Obtener los vecinos permitidos por las restricciones de la lista tabú
+                neighbors = self.get_neighbors(actual.state, problem, tabu_list)
+                # Elegir el vecino con el mejor valor objetivo
+                best_neighbor = max(neighbors, key=lambda x: x.value)
+                # Retornar si estamos en un óptimo local
+                if best_neighbor.value <= actual.value:
+                    self.tour = actual.state
+                    self.value = actual.value
+                    end = time()
+                    self.time = end - start
+                    return
+                else:
+                    # Moverse al vecino seleccionado
+                    actual = best_neighbor
+                    # Agregar el movimiento a la lista Tabú
+                    tabu_list.append(best_neighbor.state)
+                    if len(tabu_list) > self.tabu_list_size:
+                        # Eliminar elementos aleatorios en la lista Tabú
+                        tabu_list = self.remove_elements_random(tabu_list)
+                    iter_count += 1
+                    self.niters += 1
+            # Asignar la mejor solución encontrada a las variables de la instancia
+            self.tour = actual.state
+            self.value = actual.value
+            # Finalizar el reloj
+            end = time()
+            self.time = end - start
+        except Exception as e:
+            logger.error(f"Se produjo un error en el método solve: {e}", exc_info=True)
+            self.tour = None
+            self.value = None
+            self.time = None
