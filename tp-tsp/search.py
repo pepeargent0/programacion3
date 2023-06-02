@@ -169,7 +169,7 @@ class HillClimbingReset(LocalSearch):
 class Tabu(LocalSearch):
     """Algoritmo de búsqueda tabú."""
 
-    def __init__(self, tabu_list_size=None, max_iters=None):
+    def __init__(self, tabu_list_size=0, max_iters=None):
         """
         Construye una instancia de la clase Tabu.
         tabu_list_size: int tamaño de la lista tabú (por defecto, None)
@@ -210,8 +210,8 @@ class Tabu(LocalSearch):
         # Se devuelve la lista de vecinos permitidos junto con sus valores objetivo
         return neighbors
 
-    @classmethod
-    def remove_elements_random(cls, tabu_list: List[State]) -> List[State]:
+
+    def remove_elements_random(self, tabu_list: List[State]) -> List[State]:
         """
         Elimina elementos aleatorios en la lista Tabú.
         tabu_list: List[State] - Lista Tabú que contiene los elementos a eliminar.
@@ -219,8 +219,8 @@ class Tabu(LocalSearch):
         List[State]: Lista Tabú modificada después de eliminar elementos aleatorios.
         """
         try:
-            if len(tabu_list) > cls.tabu_list_size:
-                indices = sample(range(len(tabu_list)), len(tabu_list) - cls.tabu_list_size)
+            if len(tabu_list) > self.tabu_list_size:
+                indices = sample(range(len(tabu_list)), len(tabu_list) - self.tabu_list_size)
                 tabu_list = [tabu_list[i] for i in range(len(tabu_list)) if i not in indices]
             return tabu_list
         except Exception as e:
@@ -238,7 +238,7 @@ class Tabu(LocalSearch):
             # Inicio del reloj
             start = time()
             tabu_list = []
-            if self.tabu_list_size is None:
+            if self.tabu_list_size == 0:
                 self.tabu_list_size = int(len(problem.init) * 0.30)
             if self.max_iters is None:
                 self.max_iters = len(problem.init)
