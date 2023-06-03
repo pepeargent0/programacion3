@@ -170,10 +170,10 @@ class HillClimbingReset(LocalSearch):
 class Tabu(LocalSearch):
     """Algoritmo de búsqueda tabú."""
 
-    def __init__(self, tabu_list_size=0, max_iters=None):
+    def __init__(self, tabu_list_size: float = 0.0, max_iters=None):
         """
         Construye una instancia de la clase Tabu.
-        tabu_list_size: int tamaño de la lista tabú (por defecto, None)
+        tabu_list_size: float porcentaje de la lista tabú con respecto al tamaño del problema (por defecto, 0)
         max_iters: int número máximo de iteraciones (por defecto, None)
         """
         super().__init__()
@@ -236,10 +236,15 @@ class Tabu(LocalSearch):
         try:
             # Inicio del reloj
             start = time()
-            # tabu_list = []
             tabu_list = set()
-            if self.tabu_list_size == 0:
+
+            if self.tabu_list_size == 0.0:
                 self.tabu_list_size = int(len(problem.init) * 0.20)
+            else:
+                self.tabu_list_size = int(len(problem.init)*float(self.tabu_list_size))
+            print("=================0")
+            print(len(problem.init))
+            print('porcentaje:', self.tabu_list_size)
             if self.max_iters is None:
                 self.max_iters = len(problem.init)
             iter_count = 0

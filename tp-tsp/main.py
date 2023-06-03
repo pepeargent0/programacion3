@@ -14,18 +14,17 @@ import problem
 # Algoritmos involucrados
 HILL_CLIMBING = "hill"
 HILL_CLIMBING_RANDOM_RESET = "hill_reset"
-TABU5_SEARCH = "tabu"
-TABU15_SEARCH = "tabu"
-TABU25_SEARCH = "tabu"
-TABU35_SEARCH = "tabu"
-TABU45_SEARCH = "tabu"
-TABU55_SEARCH = "tabu"
-TABU65_SEARCH = "tabu"
-TABU75_SEARCH = "tabu"
-TABU85_SEARCH = "tabu"
+TABU5_SEARCH = "tabu5%"
+TABU15_SEARCH = "tabu15%"
+TABU25_SEARCH = "tabu25%"
+TABU35_SEARCH = "tabu35%"
+TABU45_SEARCH = "tabu45%"
+TABU55_SEARCH = "tabu6"
+TABU65_SEARCH = "tabu7"
+TABU75_SEARCH = "tabu8"
 HILL_CLIMBING_RANDOM_RESET_ESTOCASTICO = "hill_reset_estocastico"
 #ALGO_NAMES = [HILL_CLIMBING, HILL_CLIMBING_RANDOM_RESET, HILL_CLIMBING_RANDOM_RESET_ESTOCASTICO, TABU_SEARCH]
-ALGO_NAMES = [TABU5_SEARCH, TABU15_SEARCH, TABU25_SEARCH, TABU35_SEARCH, TABU45_SEARCH, TABU55_SEARCH, TABU65_SEARCH, TABU75_SEARCH, TABU85_SEARCH]
+ALGO_NAMES = [TABU5_SEARCH, TABU15_SEARCH, TABU25_SEARCH, TABU35_SEARCH, TABU45_SEARCH, TABU55_SEARCH, TABU65_SEARCH, TABU75_SEARCH]
 
 def main() -> None:
     """Funcion principal."""
@@ -41,15 +40,14 @@ def main() -> None:
     # Construir las instancias de los algoritmos
     algos = {
         #HILL_CLIMBING: search.HillClimbing(),
-        TABU5_SEARCH: search.Tabu(tabu_list_size=5),
-        TABU15_SEARCH: search.Tabu(tabu_list_size=15),
-        TABU25_SEARCH: search.Tabu(tabu_list_size=25),
-        TABU35_SEARCH: search.Tabu(tabu_list_size=35),
-        TABU45_SEARCH: search.Tabu(tabu_list_size=45),
-        TABU55_SEARCH: search.Tabu(tabu_list_size=55),
-        TABU65_SEARCH: search.Tabu(tabu_list_size=65),
-        TABU75_SEARCH: search.Tabu(tabu_list_size=75),
-        TABU85_SEARCH: search.Tabu(tabu_list_size=85),
+        TABU5_SEARCH: search.Tabu(tabu_list_size=0.10),
+        TABU15_SEARCH: search.Tabu(tabu_list_size=0.20),
+        TABU25_SEARCH: search.Tabu(tabu_list_size=0.30),
+        TABU35_SEARCH: search.Tabu(tabu_list_size=0.40),
+        TABU45_SEARCH: search.Tabu(tabu_list_size=0.50),
+        TABU55_SEARCH: search.Tabu(tabu_list_size=0.60),
+        TABU65_SEARCH: search.Tabu(tabu_list_size=0.70),
+        TABU75_SEARCH: search.Tabu(tabu_list_size=0.80)
         #HILL_CLIMBING_RANDOM_RESET: search.HillClimbingReset(
         #    max_restarts=2,
         #    max_iters=20
@@ -68,8 +66,8 @@ def main() -> None:
 
     # Resolver el TSP con cada algoritmo
     for algo in algos.values():
-        print(algo)
-        #algo.solve(p)
+        #print(algo)
+        algo.solve(p)
 
     # Mostrar resultados por linea de comandos
     print("Valor:", "Tiempo:", "Iters:", "Algoritmo:", sep="\t\t")
