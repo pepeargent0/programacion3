@@ -21,18 +21,17 @@ class BreadthFirstSearch:
         explored = {}
         frontier = QueueFrontier()
         frontier.add(node)
+        explored[node.state] = True
         while not frontier.is_empty():
-            if frontier.is_empty():
-                return NoSolution(explored)
             node = frontier.remove()
             explored[node.state] = True
             if node.state == grid.end:
                 return Solution(node, explored)
             neighbours = grid.get_neighbours(node.state)
             for neighbor_state in neighbours:
-                new_state = neighbours[neighbor_state]
-                if neighbor_state not in explored and not frontier.contains_state(new_state):
-                    new_node = Node("", new_state, node.cost + grid.get_cost(new_state))
+                node_state = neighbours[neighbor_state]
+                if node_state not in explored and not frontier.contains_state(node_state):
+                    new_node = Node("", node_state, node.cost + grid.get_cost(node_state))
                     new_node.parent = node
                     new_node.action = neighbor_state
                     frontier.add(new_node)
