@@ -211,7 +211,7 @@ class Tabu(LocalSearch):
         return neighbors
 
 
-    def remove_elements_random(self, tabu_list: List[State]) -> List[State]:
+    def remove_elements_random(self, tabu_list: List[State]) -> set[State]:
         """
         Elimina elementos aleatorios en la lista Tabú.
         tabu_list: List[State] - Lista Tabú que contiene los elementos a eliminar.
@@ -220,12 +220,17 @@ class Tabu(LocalSearch):
         """
         try:
             if len(tabu_list) > self.tabu_list_size:
-                indices = sample(range(len(tabu_list)), len(tabu_list) - self.tabu_list_size)
-                tabu_list = [tabu_list[i] for i in range(len(tabu_list)) if i not in indices]
+                #indices = sample(range(len(tabu_list)), len(tabu_list) - self.tabu_list_size)
+                # Se seleccionan elementos aleatorios para eliminar del conjunto Tabú
+                elements_to_remove = sample(tabu_list, len(tabu_list) - self.tabu_list_size)
+                # Se eliminan los elementos seleccionados del conjunto Tabú
+                tabu_list -= set(elements_to_remove)
+                #tabu_list = [tabu_list[i] for i in range(len(tabu_list)) if i not in indices]
             return tabu_list
         except Exception as e:
             logger.error(f"Se produjo un error al eliminar elementos de la lista Tabú: {e}", exc_info=True)
-            return []
+            #return []
+            return set()
 
     def solve(self, problem: OptProblem):
         """
@@ -237,7 +242,8 @@ class Tabu(LocalSearch):
         try:
             # Inicio del reloj
             start = time()
-            tabu_list = []
+            #tabu_list = []
+            tabu_list = set()
             if self.tabu_list_size == 0:
                 self.tabu_list_size = int(len(problem.init) * 0.30)
             if self.max_iters is None:
@@ -260,7 +266,8 @@ class Tabu(LocalSearch):
                     # Moverse al vecino seleccionado
                     actual = best_neighbor
                     # Agregar el movimiento a la lista Tabú
-                    tabu_list.append(best_neighbor.state)
+                    #tabu_list.append(best_neighbor.state)
+                    tabu_list.add(tuple(best_neighbor.state))
                     if len(tabu_list) > self.tabu_list_size:
                         # Eliminar elementos aleatorios en la lista Tabú
                         tabu_list = self.remove_elements_random(tabu_list)
