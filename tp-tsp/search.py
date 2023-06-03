@@ -94,11 +94,12 @@ class HillClimbingReset(LocalSearch):
     Se realiza un reinicio aleatorio cuando se alcanza un óptimo local.
     """
 
-    def __init__(self, max_restarts: int = 3, max_iters: int = 10, rest: str = 'estocastico'):
+    def __init__(self, max_restarts: int = 3, max_iters: int = 10, rest: bool = False):
         """
         Construye una instancia de la clase HillClimbingReset.
         max_restarts: int máximo número de reinicios (por defecto, 3)
         max_iters: int numero maximo de interaciones (por defecto 10)
+        type_reset: bool True para versión estocástica (por defecto False)
         """
         super().__init__()
         self.max_restarts = max_restarts
@@ -132,10 +133,10 @@ class HillClimbingReset(LocalSearch):
                     diff = problem.val_diff(actual.state)
                     # Elegir una acción aleatoria de las que generan incremento positivo en el valor objetivo
 
-                    if self.type_reset == 'estocastico':
-                        positive_diff_acts = [act for act, val in diff.items() if val > 0]
-                    else:
+                    if self.type_reset:
                         positive_diff_acts = [act for act, val in diff.items() if val == max(diff.values())]
+                    else:
+                        positive_diff_acts = [act for act, val in diff.items() if val > 0]
 
                     if positive_diff_acts:
                         act = choice(positive_diff_acts)
@@ -238,7 +239,7 @@ class Tabu(LocalSearch):
             # tabu_list = []
             tabu_list = set()
             if self.tabu_list_size == 0:
-                self.tabu_list_size = int(len(problem.init) * 0.30)
+                self.tabu_list_size = int(len(problem.init) * 0.20)
             if self.max_iters is None:
                 self.max_iters = len(problem.init)
             iter_count = 0
@@ -259,7 +260,6 @@ class Tabu(LocalSearch):
                     # Moverse al vecino seleccionado
                     actual = best_neighbor
                     # Agregar el movimiento a la lista Tabú
-                    # tabu_list.append(best_neighbor.state)
                     tabu_list.add(tuple(best_neighbor.state))
                     if len(tabu_list) > self.tabu_list_size:
                         # Eliminar elementos aleatorios en la lista Tabú
