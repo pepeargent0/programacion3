@@ -239,12 +239,9 @@ class Tabu(LocalSearch):
             tabu_list = set()
 
             if self.tabu_list_size == 0.0:
-                self.tabu_list_size = int(len(problem.init) * 0.20)
+                self.tabu_list_size = int(len(problem.init) * 0.18)
             else:
                 self.tabu_list_size = int(len(problem.init)*float(self.tabu_list_size))
-            print("=================0")
-            print(len(problem.init))
-            print('porcentaje:', self.tabu_list_size)
             if self.max_iters is None:
                 self.max_iters = len(problem.init)
             iter_count = 0
