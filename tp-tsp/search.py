@@ -178,13 +178,13 @@ class Tabu(LocalSearch):
         super().__init__()
         self.tabu_list_size = tabu_list_size
         self.max_iters = max_iters
-
     @staticmethod
     def get_neighbors(
-            state: State,
+            state: List,
             problem: OptProblem,
-            tabu_list: Optional[List[State]] = None
+            tabu_list: Optional[set[tuple]] = None
     ) -> List[Node]:
+
         """
         Obtiene los vecinos permitidos por las restricciones de la lista tabú.
         state: estado actual
@@ -211,25 +211,20 @@ class Tabu(LocalSearch):
         return neighbors
 
 
-    def remove_elements_random(self, tabu_list: List[State]) -> set[State]:
+
+    def remove_elements_random(self, tabu_list: Set[tuple]) -> Set[tuple]:
         """
         Elimina elementos aleatorios en la lista Tabú.
-        tabu_list: List[State] - Lista Tabú que contiene los elementos a eliminar.
+        tabu_list: Set[tuple] - Lista Tabú que contiene los elementos a eliminar.
         Return
-        List[State]: Lista Tabú modificada después de eliminar elementos aleatorios.
+        Set[tuple]: Lista Tabú modificada después de eliminar elementos aleatorios.
         """
         try:
             if len(tabu_list) > self.tabu_list_size:
-                #indices = sample(range(len(tabu_list)), len(tabu_list) - self.tabu_list_size)
-                # Se seleccionan elementos aleatorios para eliminar del conjunto Tabú
-                elements_to_remove = sample(tabu_list, len(tabu_list) - self.tabu_list_size)
-                # Se eliminan los elementos seleccionados del conjunto Tabú
-                tabu_list -= set(elements_to_remove)
-                #tabu_list = [tabu_list[i] for i in range(len(tabu_list)) if i not in indices]
+                tabu_list = set(sample(tabu_list, self.tabu_list_size))
             return tabu_list
         except Exception as e:
             logger.error(f"Se produjo un error al eliminar elementos de la lista Tabú: {e}", exc_info=True)
-            #return []
             return set()
 
     def solve(self, problem: OptProblem):
