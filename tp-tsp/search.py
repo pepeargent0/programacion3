@@ -18,7 +18,7 @@ No viene implementado, se debe completar.
 
 from __future__ import annotations
 
-from typing import Optional, List
+from typing import Optional, List, Set
 
 from problem import OptProblem, State
 from node import Node
@@ -178,18 +178,18 @@ class Tabu(LocalSearch):
         super().__init__()
         self.tabu_list_size = tabu_list_size
         self.max_iters = max_iters
+
     @staticmethod
     def get_neighbors(
             state: List,
             problem: OptProblem,
-            tabu_list: Optional[set[tuple]] = None
+            tabu_list: Optional[Set[tuple]] = None
     ) -> List[Node]:
-
         """
         Obtiene los vecinos permitidos por las restricciones de la lista tabú.
         state: estado actual
         problem: OptProblem un problema de optimización
-        tabu_list: list lista tabú que contiene los movimientos prohibidos
+        tabu_list: set lista tabú que contiene los movimientos prohibidos
         Return
         list: lista de vecinos permitidos junto con sus valores objetivo
         """
@@ -197,7 +197,7 @@ class Tabu(LocalSearch):
         try:
             for action in problem.actions(state):
                 # Se verifica si el movimiento es permitido por las restricciones de la lista tabú
-                if action not in tabu_list:
+                if tuple(action) not in tabu_list:
                     # Se obtiene el estado vecino aplicando la acción al estado actual
                     neighbor_state = problem.result(state, action)
                     # Se calcula el valor objetivo del estado vecino
@@ -209,8 +209,6 @@ class Tabu(LocalSearch):
             return []
         # Se devuelve la lista de vecinos permitidos junto con sus valores objetivo
         return neighbors
-
-
 
     def remove_elements_random(self, tabu_list: Set[tuple]) -> Set[tuple]:
         """
@@ -237,7 +235,7 @@ class Tabu(LocalSearch):
         try:
             # Inicio del reloj
             start = time()
-            #tabu_list = []
+            # tabu_list = []
             tabu_list = set()
             if self.tabu_list_size == 0:
                 self.tabu_list_size = int(len(problem.init) * 0.30)
@@ -261,7 +259,7 @@ class Tabu(LocalSearch):
                     # Moverse al vecino seleccionado
                     actual = best_neighbor
                     # Agregar el movimiento a la lista Tabú
-                    #tabu_list.append(best_neighbor.state)
+                    # tabu_list.append(best_neighbor.state)
                     tabu_list.add(tuple(best_neighbor.state))
                     if len(tabu_list) > self.tabu_list_size:
                         # Eliminar elementos aleatorios en la lista Tabú
