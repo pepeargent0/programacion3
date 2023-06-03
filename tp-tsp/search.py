@@ -220,7 +220,7 @@ class Tabu(LocalSearch):
         """
         try:
             if len(tabu_list) > self.tabu_list_size:
-                tabu_list = set(sample(tabu_list, self.tabu_list_size))
+                tabu_list = set(sample(list(tabu_list), self.tabu_list_size))
             return tabu_list
         except Exception as e:
             logger.error(f"Se produjo un error al eliminar elementos de la lista Tabú: {e}", exc_info=True)
