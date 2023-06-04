@@ -1,8 +1,3 @@
-## Integrantes:
-* Nemeth, Ulises
-* Ponce, Daniel
-* Yañez, Mirian
-
 # TP: Problema del Viajante (TSP)
 Solver de TSP en Python. 
 
