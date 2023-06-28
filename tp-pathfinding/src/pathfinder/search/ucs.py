@@ -20,7 +20,7 @@ class UniformCostSearch:
         start_node = Node("", grid.start, 0)
         explored: Dict[Tuple[int, int], bool] = {}
         frontier = PriorityQueueFrontier()
-        frontier.add(start_node)
+        frontier.add(start_node, start_node.cost)
         while not frontier.is_empty():
             node = frontier.pop()
             if node.state in explored:
@@ -35,5 +35,5 @@ class UniformCostSearch:
                     new_node = Node("", new_state, node.cost + grid.get_cost(new_state))
                     new_node.parent = node
                     new_node.action = neighbor_state
-                    frontier.add(new_node)
+                    frontier.add(new_node, node.cost + grid.get_cost(new_state) )
         return NoSolution(explored)
